@@ -10,17 +10,20 @@ buildscript {
   }
   dependencies {
     classpath(kotlin("gradle-plugin", kotlin_version))
+    classpath("com.android.tools.build:gradle:7.2.0")
   }
 }
+
 plugins {
-  id("com.android.library")
   kotlin("multiplatform") version "1.7.20"
-  id("kotlin-android-extensions")
+  kotlin("plugin.serialization") version "1.7.20"
+  id("org.jetbrains.kotlin.android") version "1.7.20" apply false
+  id("com.android.library") version "7.4.0"
   id("maven-publish")
 }
 
 group = "ltd.mbor"
-version = "1.0-SNAPSHOT"
+version = "0.1-SNAPSHOT"
 
 repositories {
   google()
@@ -54,6 +57,9 @@ kotlin {
   
   android {
     publishLibraryVariants("release", "debug")
+    compilations.all {
+      kotlinOptions.jvmTarget = "11"
+    }
   }
   sourceSets {
     val commonMain by getting {

@@ -1,6 +1,5 @@
 package ltd.mbor.minimak
 
-import com.ionspin.kotlin.bignum.serialization.kotlinx.bigdecimal.bigDecimalHumanReadableSerializerModule
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
@@ -13,11 +12,6 @@ import kotlinx.serialization.json.*
 import kotlin.coroutines.coroutineContext
 
 typealias Callback = (suspend (JsonElement) -> Unit)?
-
-val json = Json {
-  ignoreUnknownKeys = true
-  serializersModule = bigDecimalHumanReadableSerializerModule
-}
 
 expect fun encodeURIComponent(data: String): String
 
@@ -45,7 +39,8 @@ object MDS {
   /**
    * Minima Startup - with the callback function used for all Minima messages
    */
-  suspend fun init(minidappuid: String, host: String, port: Int, callback: Callback = null) {
+  suspend fun init(minidappuid: String, host: String, port: Int, logging: Boolean = false, callback: Callback = null) {
+    this.logging = logging
     this.minidappuid = minidappuid
     log("Initialising MDS [$minidappuid]")
     
@@ -155,16 +150,14 @@ object MDS {
       null
     }
     return response?.takeIf { it.status.isSuccess() }?.let {
-      log("STATUS: ${response.status}; RESPONSE:${response.bodyAsText()}");
+      if (logging) log("STATUS: ${response.status}; RESPONSE:${response.bodyAsText()}");
       
       json.parseToJsonElement(response.bodyAsText())
     }
   }
   
   private suspend fun httpPostAsyncPoll(theUrl: String, params: String, callback: Callback){
-    if(logging){
-      log("POST_POLL_RPC:$theUrl PARAMS:$params")
-    }
+    if (logging) log("POST_POLL_RPC:$theUrl PARAMS:$params")
     
     try {
       val response = client.post(theUrl) {
@@ -176,9 +169,7 @@ object MDS {
         setBody(encodeURIComponent(params))
       }
       if (response.status.isSuccess()) {
-        if(logging){
-          log("STATUS: ${response.status}; RESPONSE:${response.bodyAsText()}")
-        }
+        if (logging) log("STATUS: ${response.status}; RESPONSE:${response.bodyAsText()}")
         callback?.invoke(json.parseToJsonElement(response.bodyAsText()))
       } else {
         log("STATUS: ${response.status}; RESPONSE:${response.bodyAsText()}")
