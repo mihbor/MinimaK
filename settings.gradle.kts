@@ -12,5 +12,5 @@ pluginManagement {
         }
     }
 }
-rootProject.name = "MinimaK"
+rootProject.name = "minimak"
 
