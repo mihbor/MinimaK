@@ -9,9 +9,7 @@
 # You can also reference a tag or branch, but the action may change without warning.
 
 name: Publish package to GitHub Packages
-on:
-  release:
-    types: [created]
+on: [ push ]
 jobs:
   publish:
     runs-on: ubuntu-latest
