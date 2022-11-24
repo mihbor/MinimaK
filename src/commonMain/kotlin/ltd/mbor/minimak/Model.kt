@@ -89,15 +89,17 @@ data class Contact(
   @JsonNames("myaddress")
   val myAddress: String,
   @JsonNames("lastseen")
-  val lastSeen: Int,
+  val lastSeen: Long,
   val date: String,
   @JsonNames("chaintip")
-  val chainTip: String,
+  val _chainTip: String,
   @JsonNames("samechain")
   val sameChain: Boolean,
   @JsonNames("extradata")
   val extraData: ExtraData
-)
+) {
+  val chainTip = _chainTip.toInt()
+}
 
 @Serializable
 data class ExtraData(
@@ -105,10 +107,13 @@ data class ExtraData(
   @JsonNames("minimaaddress")
   val minimaAddress: String,
   @JsonNames("topblock")
-  val topBlock: String,
+  val _topBlock: String,
   @JsonNames("checkblock")
-  val checkBlock: String,
+  val _checkBlock: String,
   @JsonNames("checkhash")
   val checkHash: String,
   val mls: String
-)
+) {
+  val topBlock = _topBlock.toInt()
+  val checkBlock = _checkBlock.toInt()
+}
