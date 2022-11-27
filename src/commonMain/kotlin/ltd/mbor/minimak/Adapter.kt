@@ -5,7 +5,6 @@ package ltd.mbor.minimak
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.*
-import kotlin.random.Random
 
 data class Result(
   val isSuccessful: Boolean,
@@ -60,21 +59,6 @@ suspend fun MDS.getCoins(tokenId: String? = null, address: String? = null, coinI
   val coinSimple = cmd("coins ${tokenId?.let{"tokenid:$tokenId "} ?:""}${address?.let{"address:$address "} ?:""}${coinId?.let{" coinid:$it"} ?:""} sendable:$sendable")!!
   val coins = json.decodeFromJsonElement<List<Coin>>(coinSimple.jsonObject["response"]!!)
   return coins.sortedBy { it.amount }
-}
-
-suspend fun MDS.transact(inputCoinIds: List<String>, outputs: List<Output>): Result {
-  val txId = Random.nextInt(1000000000)
-  cmd("txncreate id:$txId")
-  inputCoinIds.forEach {
-    cmd("txninput id:$txId coinid:$it")
-  }
-  outputs.forEach {
-    cmd("txnoutput id:$txId amount:${it.amount.toPlainString()} address:${it.address} tokenid:${it.tokenId}")
-  }
-  cmd("txnsign id:$txId publickey:auto")
-  val result = cmd("txnpost id:$txId auto:true")!!
-  cmd("txndelete id:$txId")
-  return Result(result.jsonBoolean("status")!!, result.jsonString("message"))
 }
 
 suspend fun MDS.createToken(name: String, supply: BigDecimal, decimals: Int, imageUrl: String): Result {
