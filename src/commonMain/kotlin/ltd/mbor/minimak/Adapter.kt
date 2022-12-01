@@ -20,8 +20,8 @@ suspend fun MDS.getBlockNumber(): Int {
   return status.jsonObject["response"]!!.jsonObject["chain"]!!.jsonObject["block"]!!.jsonPrimitive.int
 }
 
-suspend fun MDS.getBalances(address: String? = null): List<Balance> {
-  val balance = cmd("balance ${address?.let{ "address:$address " } ?:""}")!!
+suspend fun MDS.getBalances(address: String? = null, confirmations: Int? = null): List<Balance> {
+  val balance = cmd("balance ${address?.let{ "address:$address " } ?:""}${confirmations?.let{ "confirmations:$confirmations " } ?:""}")!!
   return json.decodeFromJsonElement(balance.jsonObject["response"]!!)
 }
 
