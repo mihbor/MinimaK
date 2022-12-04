@@ -55,8 +55,14 @@ suspend fun MDS.deployScript(text: String): String {
   return newscript.jsonObject["response"]!!.jsonString("address")!!
 }
 
-suspend fun MDS.getCoins(tokenId: String? = null, address: String? = null, coinId: String? = null, sendable: Boolean = false): List<Coin> {
-  val coinSimple = cmd("coins ${tokenId?.let{"tokenid:$tokenId "} ?:""}${address?.let{"address:$address "} ?:""}${coinId?.let{" coinid:$it"} ?:""} sendable:$sendable")!!
+suspend fun MDS.getCoins(tokenId: String? = null, address: String? = null, coinId: String? = null, sendable: Boolean = false, relevant: Boolean = true): List<Coin> {
+  val coinSimple = cmd("""coins
+    |${tokenId?.let{" tokenid:$tokenId"} ?:""}
+    |${address?.let{" address:$address "} ?:""}
+    |${coinId?.let{" coinid:$it"} ?:""}
+    | sendable:$sendable
+    | relevant:$relevant
+    |""".trimMargin())!!
   val coins = json.decodeFromJsonElement<List<Coin>>(coinSimple.jsonObject["response"]!!)
   return coins.sortedBy { it.amount }
 }

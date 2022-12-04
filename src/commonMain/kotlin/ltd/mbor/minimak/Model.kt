@@ -76,7 +76,8 @@ data class State(
 data class Output(
   val address: String,
   val amount: BigDecimal,
-  val tokenId: String
+  val tokenId: String,
+  val storeState: Boolean? = null
 )
 
 @Serializable
