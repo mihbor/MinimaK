@@ -9,7 +9,7 @@ import kotlinx.serialization.json.*
 data class Result(
   val isSuccessful: Boolean,
   val message: String?
-){
+) {
   companion object {
     val empty = Result(false, "")
   }
@@ -101,6 +101,11 @@ suspend fun MDS.exportCoin(coinId: String): String {
 
 suspend fun MDS.importCoin(data: String) {
   val coinimport = cmd("coinimport data:$data")
+}
+
+suspend fun MDS.getTransactions(address: String? = null, transactionId: String? = null): JsonElement? {
+  val txnpow = cmd("txpow${address?.let{ " address:$it" }?:""}${transactionId?.let { " txpowid:$it" } ?: ""}")!!
+  return txnpow.jsonObject["response"]
 }
 
 suspend fun MDS.getContacts(): List<Contact> {
