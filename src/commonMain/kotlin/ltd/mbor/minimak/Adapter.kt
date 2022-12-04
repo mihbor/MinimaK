@@ -61,8 +61,8 @@ suspend fun MDS.getCoins(tokenId: String? = null, address: String? = null, coinI
   return coins.sortedBy { it.amount }
 }
 
-suspend fun MDS.createToken(name: String, supply: BigDecimal, decimals: Int, imageUrl: String): Result {
-  val result = cmd("""tokencreate name:{"name":"$name", "url":"$imageUrl"} amount:${supply.toPlainString()}${if (decimals > 0) ".$decimals" else ""}""")!!
+suspend fun MDS.createToken(name: String, supply: BigDecimal, decimals: Int, imageUrl: String? = null): Result {
+  val result = cmd("""tokencreate name:{"name":"$name"${imageUrl?.let{""", "url":"$it""""} ?: ""} amount:${supply.toPlainString()}${if (decimals > 0) ".$decimals" else ""}""")!!
   return Result(result.jsonBoolean("status")!!, result.jsonString("message"))
 }
 
