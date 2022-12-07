@@ -45,7 +45,7 @@ object MDS {
     log("Initialising MDS [$minidappuid]")
     
     mainhost 	= "https://$host:$port/"
-    log("MDS MAINHOST : "+ mainhost)
+    if (MDS.logging) log("MDS MAINHOST : "+ mainhost)
     
     //Store this for poll messages
     MDS_MAIN_CALLBACK = callback
@@ -135,7 +135,7 @@ object MDS {
    * @returns
    */
   private suspend fun httpPostAsync(theUrl: String, params: String): JsonElement? {
-    log("POST_RPC:$theUrl PARAMS:$params")
+    if (logging) log("POST_RPC:$theUrl PARAMS:$params")
     
     val response = try {
       client.post(theUrl) {
