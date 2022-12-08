@@ -35,6 +35,7 @@ suspend fun MDS.getScripts(): Map<String, String> {
   val addresses = scripts.jsonObject["response"]!!.jsonArray
   return addresses.associate{ it.jsonString("address")!! to it.jsonString("script")!! }
 }
+
 suspend fun MDS.getAddress(): String {
   val getaddress = cmd("getaddress")!!
   return getaddress.jsonObject["response"]!!.jsonString("miniaddress")!!
@@ -56,13 +57,14 @@ suspend fun MDS.deployScript(text: String): String {
 }
 
 suspend fun MDS.getCoins(tokenId: String? = null, address: String? = null, coinId: String? = null, sendable: Boolean = false, relevant: Boolean = true): List<Coin> {
-  val coinSimple = cmd("""coins
-    |${tokenId?.let{" tokenid:$tokenId"} ?:""}
-    |${address?.let{" address:$address "} ?:""}
-    |${coinId?.let{" coinid:$it"} ?:""}
-    | sendable:$sendable
-    | relevant:$relevant
-    |""".trimMargin())!!
+  val coinSimple = cmd(buildString {
+    append("coins")
+    tokenId?.let { append(" tokenid:$tokenId") }
+    address?.let { append(" address:$address ") }
+    coinId?.let { append(" coinid:$it") }
+    append(" sendable:$sendable")
+    append(" relevant:$relevant")
+  })!!
   val coins = json.decodeFromJsonElement<List<Coin>>(coinSimple.jsonObject["response"]!!)
   return coins.sortedBy { it.amount }
 }
