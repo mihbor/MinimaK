@@ -4,21 +4,26 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.serialization.json.jsonArray
 import kotlin.random.Random
 
-suspend fun MDS.transact(inputCoinIds: List<String>, outputs: List<Output>): Result {
+suspend fun MDS.transact(inputCoinIds: List<String>, outputs: List<Output>, states: List<String> = emptyList()): Result {
   val txId = Random.nextInt(1000000000)
   
-  val commands = """
-    txncreate id:$txId;
-    ${inputCoinIds.joinToString("\n") {
-    "txninput id:$txId coinid:$it;"
-  }}
-    ${outputs.joinToString("\n") {
-    "txnoutput id:$txId amount:${it.amount.toPlainString()} address:${it.address} tokenid:${it.tokenId};"
-  }}
-    txnsign id:$txId publickey:auto;
-    txnpost id:$txId auto:true;
-    txndelete id:$txId;
-  """.trimIndent()
+  val commands = buildString {
+    appendLine("txncreate id:$txId;")
+    inputCoinIds.forEach {
+      appendLine("txninput id:$txId coinid:$it;")
+    }
+    outputs.forEach {
+      append("txnoutput id:$txId amount:${it.amount.toPlainString()} address:${it.address} tokenid:${it.tokenId}")
+      it.storeState?.also { append(" storestate:$it") }
+      appendLine(";")
+    }
+    states.forEachIndexed{ index, it ->
+      appendLine("txnstate id:$txId port:$index value:$it;")
+    }
+    appendLine("txnsign id:$txId publickey:auto;")
+    appendLine("txnpost id:$txId auto:true;")
+    append("txndelete id:$txId;")
+  }
   
   val results = cmd(commands)!!.jsonArray
   val postResult = results.find{ it.jsonString("command") == "txnpost" }
@@ -26,9 +31,9 @@ suspend fun MDS.transact(inputCoinIds: List<String>, outputs: List<Output>): Res
 }
 
 
-suspend fun MDS.send(toAddress: String, amount: BigDecimal, tokenId: String): Boolean {
+suspend fun MDS.send(toAddress: String, amount: BigDecimal, tokenId: String, states: List<String> = emptyList()): Boolean {
   val (inputs, outputs) = inputsWithChange(tokenId, amount)
-  return transact(inputs.map{ it.coinId }, listOf(Output(toAddress, amount, tokenId)) + outputs).isSuccessful
+  return transact(inputs.map{ it.coinId }, listOf(Output(toAddress, amount, tokenId, states.isNotEmpty())) + outputs, states).isSuccessful
 }
 
 suspend fun MDS.inputsWithChange(tokenId: String, amount: BigDecimal): Pair<List<Coin>, List<Output>> {
@@ -37,7 +42,7 @@ suspend fun MDS.inputsWithChange(tokenId: String, amount: BigDecimal): Pair<List
   val coins = getCoins(tokenId = tokenId, sendable = true).ofAtLeast(amount)
   coins.forEach { inputs.add(it) }
   val change = coins.sumOf { it.tokenAmount } - amount
-  if (change > BigDecimal.ZERO) outputs.add(Output(newAddress(), change, tokenId))
+  if (change > BigDecimal.ZERO) outputs.add(Output(newAddress(), change, tokenId, false))
   return inputs to outputs
 }
 
