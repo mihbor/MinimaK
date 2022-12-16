@@ -8,10 +8,10 @@ import kotlinx.serialization.json.*
 
 data class Result(
   val isSuccessful: Boolean,
-  val message: String?
+  val message: String? = null
 ) {
   companion object {
-    val empty = Result(false, "")
+    val empty = Result(false, null)
   }
 }
 
@@ -34,6 +34,11 @@ suspend fun MDS.getScripts(): Map<String, String> {
   val scripts = cmd("scripts")!!
   val addresses = scripts.jsonObject["response"]!!.jsonArray
   return addresses.associate{ it.jsonString("address")!! to it.jsonString("script")!! }
+}
+
+suspend fun MDS.getScript(address: String): String {
+  val scripts = cmd("scripts address:$address")!!
+  return scripts.jsonObject["response"]!!.jsonString("script")!!
 }
 
 suspend fun MDS.getAddress(): String {
@@ -93,11 +98,12 @@ suspend fun MDS.exportTx(txnId: Int): String {
   return result.jsonObject["response"]!!.jsonString("data")!!
 }
 
-suspend fun MDS.importTx(txnId: Int, data: String): JsonObject {
-  val txncreator = "txncreate id:$txnId;" +
-    "txnimport id:$txnId data:$data;"
-  val result = cmd(txncreator)!!.jsonArray
-  val txnimport = result.find{ it.jsonString("command") == "txnimport" }!!
+suspend fun MDS.importTx(txnId: Int, data: String): Transaction {
+  val txncreator = buildString{
+    appendLine("txncreate id:$txnId;")
+    append("txnimport id:$txnId data:$data;")
+  }
+  val txnimport = cmd(txncreator)!!.jsonArray[1]
   if (logging) log("import ${txnimport.jsonBoolean("status")}")
   return json.decodeFromJsonElement(txnimport.jsonObject["response"]!!.jsonObject["transaction"]!!)
 }

@@ -49,6 +49,15 @@ data class Token(
 }
 
 @Serializable
+data class Transaction(
+  val inputs: List<Coin>,
+  val outputs: List<Coin>,
+  val state: List<State>,
+  @JsonNames("transactionid")
+  val transactionId: String
+)
+
+@Serializable
 data class Coin(
   val address: String,
   @JsonNames("miniaddress")
@@ -62,9 +71,12 @@ data class Coin(
   val storeState: Boolean,
   @JsonNames("tokenid")
   val tokenId: String,
-  val created: String,
+  @JsonNames("created")
+  val _created: String,
   val state: List<State>
-)
+) {
+  val created:Int get() = _created.toInt()
+}
 
 @Serializable
 data class State(
