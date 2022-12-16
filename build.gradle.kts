@@ -1,5 +1,5 @@
 val kotlin_version: String by extra
-val ktorVersion = "2.1.2"
+val ktorVersion = "2.2.1"
 val bignumVersion = "0.3.7"
 
 buildscript {
@@ -23,7 +23,7 @@ plugins {
 }
 
 group = "ltd.mbor"
-version = "0.1-SNAPSHOT"
+version = "0.1"
 
 repositories {
   google()
