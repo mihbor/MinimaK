@@ -117,9 +117,22 @@ suspend fun MDS.importCoin(data: String) {
   val coinimport = cmd("coinimport data:$data")
 }
 
-suspend fun MDS.getTransactions(address: String? = null, transactionId: String? = null): JsonElement? {
-  val txnpow = cmd("txpow${address?.let{ " address:$it" }?:""}${transactionId?.let { " txpowid:$it" } ?: ""}")!!
+suspend fun MDS.getTxPoWs(address: String): JsonElement? {
+  val txnpow = cmd("txpow address:$address")!!
   return txnpow.jsonObject["response"]
+}
+
+suspend fun MDS.getTxPoW(txPoWId: String): JsonElement? {
+  val txnpow = cmd("txpow txpowid:$txPoWId")!!
+  return txnpow.jsonObject["response"]
+}
+
+suspend fun MDS.getTransactions(address: String): List<Transaction>? = getTxPoWs(address)?.jsonArray?.map{
+  json.decodeFromJsonElement(it.jsonObject["body"]!!.jsonObject["txn"]!!)
+}
+
+suspend fun MDS.getTransaction(txPoWId: String): Transaction? = getTxPoW(txPoWId)?.let{
+  json.decodeFromJsonElement(it.jsonObject["body"]!!.jsonObject["txn"]!!)
 }
 
 suspend fun MDS.getContacts(): List<Contact> {
