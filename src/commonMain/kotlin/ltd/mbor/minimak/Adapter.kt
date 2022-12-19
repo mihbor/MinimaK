@@ -75,7 +75,13 @@ suspend fun MDS.getCoins(tokenId: String? = null, address: String? = null, coinI
 }
 
 suspend fun MDS.createToken(name: String, supply: BigDecimal, decimals: Int, imageUrl: String? = null): Result {
-  val result = cmd("""tokencreate name:{"name":"$name"${imageUrl?.let{""", "url":"$it""""} ?: ""} amount:${supply.toPlainString()}${if (decimals > 0) ".$decimals" else ""}""")!!
+  val tokencreate = buildString {
+    append("tokencreate name:{\"name\":\"$name\"")
+    imageUrl?.let{ append(", \"url\":\"$it\"") }
+    append("} amount:${supply.toPlainString()}")
+    if (decimals > 0) append(".$decimals")
+  }
+  val result = cmd(tokencreate)!!
   return Result(result.jsonBoolean("status")!!, result.jsonString("message"))
 }
 
