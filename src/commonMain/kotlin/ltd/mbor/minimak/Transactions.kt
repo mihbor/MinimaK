@@ -34,11 +34,11 @@ suspend fun MDS.transact(inputCoinIds: List<String>, outputs: List<Output>, stat
 }
 
 suspend fun MDS.send(toAddress: String, amount: BigDecimal, tokenId: String, states: List<String> = emptyList()) =
-  MDS.send(toAddress, amount, tokenId, states.mapIndexed{ port, value -> port to value}.toMap())
+  MDS.send(toAddress, amount, tokenId, states.mapIndexed{ port, value -> port to value}.toMap()).isSuccessful
 
-suspend fun MDS.send(toAddress: String, amount: BigDecimal, tokenId: String, states: Map<Int, String> = emptyMap()): Boolean {
+suspend fun MDS.send(toAddress: String, amount: BigDecimal, tokenId: String, states: Map<Int, String> = emptyMap()): Result {
   val (inputs, outputs) = inputsWithChange(tokenId, amount)
-  return transact(inputs.map{ it.coinId }, listOf(Output(toAddress, amount, tokenId, states.isNotEmpty())) + outputs, states).isSuccessful
+  return transact(inputs.map{ it.coinId }, listOf(Output(toAddress, amount, tokenId, states.isNotEmpty())) + outputs, states)
 }
 
 suspend fun MDS.inputsWithChange(tokenId: String, amount: BigDecimal): Pair<List<Coin>, List<Output>> {
