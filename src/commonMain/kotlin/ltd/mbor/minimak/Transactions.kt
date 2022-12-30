@@ -4,7 +4,7 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.serialization.json.jsonArray
 import kotlin.random.Random
 
-suspend fun MDS.transact(inputCoinIds: List<String>, outputs: List<Output>, states: List<String> = emptyList()) =
+suspend fun MDS.transact(inputCoinIds: List<String>, outputs: List<Output>, states: List<String>) =
   MDS.transact(inputCoinIds, outputs, states.mapIndexed{ port, value -> port to value}.toMap())
 
 suspend fun MDS.transact(inputCoinIds: List<String>, outputs: List<Output>, states: Map<Int, String> = emptyMap()): Result {
@@ -33,7 +33,7 @@ suspend fun MDS.transact(inputCoinIds: List<String>, outputs: List<Output>, stat
   return Result(postResult?.jsonBoolean("status") == true, postResult?.jsonString("message"))
 }
 
-suspend fun MDS.send(toAddress: String, amount: BigDecimal, tokenId: String, states: List<String> = emptyList()) =
+suspend fun MDS.send(toAddress: String, amount: BigDecimal, tokenId: String, states: List<String>) =
   MDS.send(toAddress, amount, tokenId, states.mapIndexed{ port, value -> port to value}.toMap()).isSuccessful
 
 suspend fun MDS.send(toAddress: String, amount: BigDecimal, tokenId: String, states: Map<Int, String> = emptyMap()): Result {
