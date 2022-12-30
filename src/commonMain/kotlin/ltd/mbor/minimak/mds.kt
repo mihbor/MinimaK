@@ -163,8 +163,6 @@ object MDS {
       val response = client.post(theUrl) {
         headers {
           append(HttpHeaders.Connection, "close")
-//        append("X-PINGOTHER", "pingpong")
-//        append(HttpHeaders.ContentType, "text/plain; charset=UTF-8")
         }
         setBody(encodeURIComponent(params))
       }

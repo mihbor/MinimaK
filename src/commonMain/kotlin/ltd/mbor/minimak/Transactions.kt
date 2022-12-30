@@ -4,7 +4,10 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.serialization.json.jsonArray
 import kotlin.random.Random
 
-suspend fun MDS.transact(inputCoinIds: List<String>, outputs: List<Output>, states: List<String> = emptyList()): Result {
+suspend fun MDS.transact(inputCoinIds: List<String>, outputs: List<Output>, states: List<String> = emptyList()) =
+  MDS.transact(inputCoinIds, outputs, states.mapIndexed{ port, value -> port to value}.toMap())
+
+suspend fun MDS.transact(inputCoinIds: List<String>, outputs: List<Output>, states: Map<Int, String> = emptyMap()): Result {
   val txId = Random.nextInt(1000000000)
   
   val commands = buildString {
@@ -17,8 +20,8 @@ suspend fun MDS.transact(inputCoinIds: List<String>, outputs: List<Output>, stat
       it.storeState?.also { append(" storestate:$it") }
       appendLine(";")
     }
-    states.forEachIndexed{ index, it ->
-      appendLine("txnstate id:$txId port:$index value:$it;")
+    states.forEach{ (port, value) ->
+      appendLine("txnstate id:$txId port:$port value:$value;")
     }
     appendLine("txnsign id:$txId publickey:auto;")
     appendLine("txnpost id:$txId auto:true;")
@@ -30,8 +33,10 @@ suspend fun MDS.transact(inputCoinIds: List<String>, outputs: List<Output>, stat
   return Result(postResult?.jsonBoolean("status") == true, postResult?.jsonString("message"))
 }
 
+suspend fun MDS.send(toAddress: String, amount: BigDecimal, tokenId: String, states: List<String> = emptyList()) =
+  MDS.send(toAddress, amount, tokenId, states.mapIndexed{ port, value -> port to value}.toMap())
 
-suspend fun MDS.send(toAddress: String, amount: BigDecimal, tokenId: String, states: List<String> = emptyList()): Boolean {
+suspend fun MDS.send(toAddress: String, amount: BigDecimal, tokenId: String, states: Map<Int, String> = emptyMap()): Boolean {
   val (inputs, outputs) = inputsWithChange(tokenId, amount)
   return transact(inputs.map{ it.coinId }, listOf(Output(toAddress, amount, tokenId, states.isNotEmpty())) + outputs, states).isSuccessful
 }
