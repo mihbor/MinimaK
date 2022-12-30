@@ -123,9 +123,9 @@ suspend fun MDS.importCoin(data: String) {
   val coinimport = cmd("coinimport data:$data")
 }
 
-suspend fun MDS.getTxPoWs(address: String): JsonElement? {
+suspend fun MDS.getTxPoWs(address: String): JsonArray? {
   val txnpow = cmd("txpow address:$address")!!
-  return txnpow.jsonObject["response"]
+  return txnpow.jsonObject["response"]?.jsonArray
 }
 
 suspend fun MDS.getTxPoW(txPoWId: String): JsonElement? {
@@ -133,7 +133,7 @@ suspend fun MDS.getTxPoW(txPoWId: String): JsonElement? {
   return txnpow.jsonObject["response"]
 }
 
-suspend fun MDS.getTransactions(address: String): List<Transaction>? = getTxPoWs(address)?.jsonArray?.map{
+suspend fun MDS.getTransactions(address: String): List<Transaction>? = getTxPoWs(address)?.map{
   json.decodeFromJsonElement(it.jsonObject["body"]!!.jsonObject["txn"]!!)
 }
 
