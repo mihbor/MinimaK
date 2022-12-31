@@ -71,6 +71,7 @@ data class Coin(
   val storeState: Boolean,
   @JsonNames("tokenid")
   val tokenId: String,
+  val token: Token?,
   @JsonNames("created")
   val _created: String,
   val state: List<State>
