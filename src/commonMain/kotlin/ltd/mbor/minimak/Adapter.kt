@@ -159,3 +159,8 @@ suspend fun MDS.sendMessage(app: String, publicKey: String, text: String): Boole
   log("sent: $text")
   return maxima.jsonBoolean("status") == true && maxima.jsonObject["response"]!!.jsonBoolean("delivered") == true
 }
+
+suspend fun MDS.hash(data: ByteArray, type: String = "keccak") = hash(data.toHex(), type)
+
+suspend fun MDS.hash(data: String, type: String = "keccak") =
+  cmd("hash data:$data type:$type")!!.jsonObject["response"]!!.jsonString("hash")
