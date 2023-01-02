@@ -15,7 +15,7 @@ data class Balance(
   val tokenId: String,
   @JsonNames("token")
   val _token: JsonElement,
-//  val total: String,
+  val total: BigDecimal,
   val confirmed: BigDecimal,
   val unconfirmed: BigDecimal,
   val sendable: BigDecimal,
@@ -54,8 +54,20 @@ data class Transaction(
   val outputs: List<Coin>,
   val state: List<State>,
   @JsonNames("transactionid")
-  val transactionId: String
-)
+  val transactionId: String,
+  val header: Header
+) {
+  @Serializable
+  data class Header(
+    @JsonNames("block")
+    val _block: String,
+    @JsonNames("timemilli")
+    val _timemilli: String
+  ) {
+    val block get() = _block.toInt()
+    val timeMillis get() = _timemilli.toLong()
+  }
+}
 
 @Serializable
 data class Coin(
@@ -76,7 +88,7 @@ data class Coin(
   val _created: String,
   val state: List<State>
 ) {
-  val created:Int get() = _created.toInt()
+  val created get() = _created.toInt()
 }
 
 @Serializable

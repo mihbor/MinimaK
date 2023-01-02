@@ -56,7 +56,10 @@ suspend fun MDS.newKey(): String {
   return keys.jsonObject["response"]!!.jsonString("publickey")!!
 }
 
-suspend fun MDS.deployScript(text: String): String {
+@Deprecated("replace with newScript(text)", ReplaceWith("newScript(text)"))
+suspend fun MDS.deployScript(text: String) = newScript(text)
+
+suspend fun MDS.newScript(text: String): String {
   val newscript = cmd("""newscript script:"$text" trackall:true""")!!
   return newscript.jsonObject["response"]!!.jsonString("address")!!
 }
@@ -74,11 +77,18 @@ suspend fun MDS.getCoins(tokenId: String? = null, address: String? = null, coinI
   return coins.sortedBy { it.amount }
 }
 
-suspend fun MDS.createToken(name: String, supply: BigDecimal, decimals: Int, imageUrl: String? = null): Result {
+suspend fun MDS.createToken(name: String, supply: BigDecimal, decimals: Int, url: String? = null) =
+  createToken(supply, decimals, name, url)
+
+suspend fun MDS.createToken(supply: BigDecimal, decimals: Int, name: String, url: String? = null): Result {
+  val nameJson = JsonObject(listOfNotNull("name" to JsonPrimitive(name), url?.let{ "url" to JsonPrimitive(it) }).toMap())
+  return createToken(supply, decimals, nameJson)
+}
+
+suspend fun MDS.createToken(supply: BigDecimal, decimals: Int, name: JsonElement): Result {
   val tokencreate = buildString {
-    append("tokencreate name:{\"name\":\"$name\"")
-    imageUrl?.let{ append(", \"url\":\"$it\"") }
-    append("} amount:${supply.toPlainString()}")
+    append("tokencreate name:{\"name\":$name}")
+    append(" amount:${supply.toPlainString()}")
     if (decimals > 0) append(".$decimals")
   }
   val result = cmd(tokencreate)!!
