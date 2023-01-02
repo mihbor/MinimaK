@@ -80,16 +80,17 @@ suspend fun MDS.getCoins(tokenId: String? = null, address: String? = null, coinI
 suspend fun MDS.createToken(name: String, supply: BigDecimal, decimals: Int, url: String? = null) =
   createToken(supply, decimals, name, url)
 
-suspend fun MDS.createToken(supply: BigDecimal, decimals: Int, name: String, url: String? = null): Result {
+suspend fun MDS.createToken(supply: BigDecimal, decimals: Int, name: String, url: String? = null, script: String? = null): Result {
   val nameJson = JsonObject(listOfNotNull("name" to JsonPrimitive(name), url?.let{ "url" to JsonPrimitive(it) }).toMap())
-  return createToken(supply, decimals, nameJson)
+  return createToken(supply, decimals, nameJson, script)
 }
 
-suspend fun MDS.createToken(supply: BigDecimal, decimals: Int, name: JsonElement): Result {
+suspend fun MDS.createToken(supply: BigDecimal, decimals: Int, name: JsonElement, script: String? = null): Result {
   val tokencreate = buildString {
     append("tokencreate name:{\"name\":$name}")
     append(" amount:${supply.toPlainString()}")
     if (decimals > 0) append(".$decimals")
+    if (script != null) append(" script:\"$script\"")
   }
   val result = cmd(tokencreate)!!
   return Result(result.jsonBoolean("status")!!, result.jsonString("message"))
