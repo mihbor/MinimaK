@@ -143,3 +143,16 @@ data class ExtraData(
   val topBlock = _topBlock.toInt()
   val checkBlock = _checkBlock.toInt()
 }
+
+@Serializable
+data class Address(
+  val script: String,
+  val address: String,
+  @JsonNames("miniaddress")
+  val miniAddress: String,
+  val simple: Boolean,
+  val default: Boolean,
+  @JsonNames("publickey")
+  val publicKey: String,
+  val track: Boolean
+)

@@ -27,38 +27,34 @@ suspend fun MDS.getTokens(): List<Token> {
   return json.decodeFromJsonElement(tokens.jsonObject["response"]!!)
 }
 
-suspend fun MDS.getScripts(): Map<String, String> {
+suspend fun MDS.getScripts(): List<Address> {
   val scripts = cmd("scripts")!!
-  val addresses = scripts.jsonObject["response"]!!.jsonArray
-  return addresses.associate{ it.jsonString("address") to it.jsonString("script") }
+  return json.decodeFromJsonElement(scripts.jsonObject["response"]!!)
 }
 
-suspend fun MDS.getScript(address: String): String {
+suspend fun MDS.getScript(address: String): Address {
   val scripts = cmd("scripts address:$address")!!
-  return scripts.jsonObject["response"]!!.jsonString("script")
+  return json.decodeFromJsonElement(scripts.jsonObject["response"]!!)
 }
 
-suspend fun MDS.getAddress(): String {
+suspend fun MDS.newScript(text: String, trackAll: Boolean = true): Address {
+  val newscript = cmd("""newscript script:"$text" trackall:$trackAll""")!!
+  return json.decodeFromJsonElement(newscript.jsonObject["response"]!!)
+}
+
+suspend fun MDS.getAddress(): Address {
   val getaddress = cmd("getaddress")!!
-  return getaddress.jsonObject["response"]!!.jsonString("miniaddress")
+  return json.decodeFromJsonElement(getaddress.jsonObject["response"]!!)
 }
 
-suspend fun MDS.newAddress(): String {
+suspend fun MDS.newAddress(): Address {
   val newaddress = cmd("newaddress")!!
-  return newaddress.jsonObject["response"]!!.jsonString("miniaddress")
+  return json.decodeFromJsonElement(newaddress.jsonObject["response"]!!)
 }
 
 suspend fun MDS.newKey(): String {
   val keys = cmd("keys action:new")!!
   return keys.jsonObject["response"]!!.jsonString("publickey")
-}
-
-@Deprecated("replace with newScript(text)", ReplaceWith("newScript(text)"))
-suspend fun MDS.deployScript(text: String) = newScript(text)
-
-suspend fun MDS.newScript(text: String): String {
-  val newscript = cmd("""newscript script:"$text" trackall:true""")!!
-  return newscript.jsonObject["response"]!!.jsonString("address")
 }
 
 suspend fun MDS.getCoins(tokenId: String? = null, address: String? = null, coinId: String? = null, sendable: Boolean = false, relevant: Boolean = true): List<Coin> {

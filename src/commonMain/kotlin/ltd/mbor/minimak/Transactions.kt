@@ -47,7 +47,7 @@ suspend fun MDS.inputsWithChange(tokenId: String, amount: BigDecimal): Pair<List
   val coins = getCoins(tokenId = tokenId, sendable = true).ofAtLeast(amount)
   coins.forEach { inputs.add(it) }
   val change = coins.sumOf { it.tokenAmount } - amount
-  if (change > BigDecimal.ZERO) outputs.add(Output(newAddress(), change, tokenId, false))
+  if (change > BigDecimal.ZERO) outputs.add(Output(getAddress().address, change, tokenId, false))
   return inputs to outputs
 }
 
