@@ -30,7 +30,7 @@ suspend fun MDS.transact(inputCoinIds: List<String>, outputs: List<Output>, stat
   
   val results = cmd(commands)!!.jsonArray
   val postResult = results.find{ it.jsonString("command") == "txnpost" }
-  return Result(postResult?.jsonBoolean("status") == true, postResult?.jsonString("message"))
+  return Result(postResult?.jsonBoolean("status") == true, postResult?.jsonStringOrNull("message"))
 }
 
 suspend fun MDS.send(toAddress: String, amount: BigDecimal, tokenId: String, states: List<String>) =

@@ -1,9 +1,6 @@
-@file:OptIn(ExperimentalSerializationApi::class)
-
 package ltd.mbor.minimak
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.*
 
 data class Result(
@@ -33,27 +30,27 @@ suspend fun MDS.getTokens(): List<Token> {
 suspend fun MDS.getScripts(): Map<String, String> {
   val scripts = cmd("scripts")!!
   val addresses = scripts.jsonObject["response"]!!.jsonArray
-  return addresses.associate{ it.jsonString("address")!! to it.jsonString("script")!! }
+  return addresses.associate{ it.jsonString("address") to it.jsonString("script") }
 }
 
 suspend fun MDS.getScript(address: String): String {
   val scripts = cmd("scripts address:$address")!!
-  return scripts.jsonObject["response"]!!.jsonString("script")!!
+  return scripts.jsonObject["response"]!!.jsonString("script")
 }
 
 suspend fun MDS.getAddress(): String {
   val getaddress = cmd("getaddress")!!
-  return getaddress.jsonObject["response"]!!.jsonString("miniaddress")!!
+  return getaddress.jsonObject["response"]!!.jsonString("miniaddress")
 }
 
 suspend fun MDS.newAddress(): String {
   val newaddress = cmd("newaddress")!!
-  return newaddress.jsonObject["response"]!!.jsonString("miniaddress")!!
+  return newaddress.jsonObject["response"]!!.jsonString("miniaddress")
 }
 
 suspend fun MDS.newKey(): String {
   val keys = cmd("keys action:new")!!
-  return keys.jsonObject["response"]!!.jsonString("publickey")!!
+  return keys.jsonObject["response"]!!.jsonString("publickey")
 }
 
 @Deprecated("replace with newScript(text)", ReplaceWith("newScript(text)"))
@@ -61,7 +58,7 @@ suspend fun MDS.deployScript(text: String) = newScript(text)
 
 suspend fun MDS.newScript(text: String): String {
   val newscript = cmd("""newscript script:"$text" trackall:true""")!!
-  return newscript.jsonObject["response"]!!.jsonString("address")!!
+  return newscript.jsonObject["response"]!!.jsonString("address")
 }
 
 suspend fun MDS.getCoins(tokenId: String? = null, address: String? = null, coinId: String? = null, sendable: Boolean = false, relevant: Boolean = true): List<Coin> {
@@ -93,7 +90,7 @@ suspend fun MDS.createToken(supply: BigDecimal, decimals: Int, name: JsonElement
     if (script != null) append(" script:\"$script\"")
   }
   val result = cmd(tokencreate)!!
-  return Result(result.jsonBoolean("status")!!, result.jsonString("message"))
+  return Result(result.jsonBoolean("status"), result.jsonStringOrNull("message"))
 }
 
 suspend fun MDS.signTx(txnId: Int, key: String): JsonElement? {
@@ -112,7 +109,7 @@ suspend fun MDS.post(txnId: Int): JsonElement? {
 suspend fun MDS.exportTx(txnId: Int): String {
   val txncreator = "txnexport id:$txnId;"
   val result = cmd(txncreator)!!
-  return result.jsonObject["response"]!!.jsonString("data")!!
+  return result.jsonObject["response"]!!.jsonString("data")
 }
 
 suspend fun MDS.importTx(txnId: Int, data: String): Transaction {
@@ -127,7 +124,7 @@ suspend fun MDS.importTx(txnId: Int, data: String): Transaction {
 
 suspend fun MDS.exportCoin(coinId: String): String {
   val coinexport = cmd("coinexport coinid:$coinId")!!
-  return coinexport.jsonString("response")!!
+  return coinexport.jsonString("response")
 }
 
 suspend fun MDS.importCoin(data: String) {
