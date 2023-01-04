@@ -87,7 +87,7 @@ suspend fun MDS.createToken(supply: BigDecimal, decimals: Int, name: String, url
 
 suspend fun MDS.createToken(supply: BigDecimal, decimals: Int, name: JsonElement, script: String? = null): Result {
   val tokencreate = buildString {
-    append("tokencreate name:{\"name\":$name}")
+    append("tokencreate name:$name")
     append(" amount:${supply.toPlainString()}")
     if (decimals > 0) append(".$decimals")
     if (script != null) append(" script:\"$script\"")
