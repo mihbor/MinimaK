@@ -16,12 +16,14 @@ class TransactionsTest {
       assertEquals(listOf(given), result)
     }
   }
+
   @Test
   fun Given_2_coins_ofAtLeast_returns_smallest_sufficient() {
     val given = listOf(coin(ONE), coin(TEN))
     assertEquals(listOf(coin(ONE)), given.ofAtLeast(ONE))
     assertEquals(listOf(coin(TEN)), given.ofAtLeast(ONE + ONE))
   }
+
   @Test
   fun Given_2_coins_ofAtLeast_returns_both_when_needed() {
     val given = listOf(coin(ONE), coin(TEN))
@@ -36,6 +38,7 @@ class TransactionsTest {
     storeState = false,
     tokenId = "",
     _created = "",
-    state = emptyList()
+    state = emptyList(),
+    token = null
   )
 }

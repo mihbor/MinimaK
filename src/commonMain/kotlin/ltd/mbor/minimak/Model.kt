@@ -55,7 +55,7 @@ data class Transaction(
   val state: List<State>,
   @JsonNames("transactionid")
   val transactionId: String,
-  val header: Header
+  val header: Header? = null
 ) {
   @Serializable
   data class Header(
