@@ -22,9 +22,13 @@ data class Balance(
   @JsonNames("coins")
   val _coins: String
 ) {
-  val tokenName get() = if (_token is JsonPrimitive) _token.jsonPrimitive.content else _token.jsonStringOrNull("name")
-  val tokenUrl get() = _token.jsonStringOrNull("url")
-  val coins get() = _coins.toInt()
+  val tokenName: String? get() = when(_token) {
+    is JsonNull -> if(tokenId == "0x00") "Minima" else null
+    is JsonPrimitive -> _token.jsonPrimitive.content
+    else -> _token.jsonStringOrNull("name")
+  }
+  val tokenUrl: String? get() = _token.jsonStringOrNull("url")
+  val coins: Int get() = _coins.toInt()
 }
 
 @Serializable
@@ -43,9 +47,12 @@ data class Token(
   @JsonNames("scale")
   val _scale: JsonPrimitive
 ) {
-  val name get() = if(_name is JsonPrimitive) _name.jsonPrimitive.content else _name.jsonStringOrNull("name")
-  val url get() = _name.jsonStringOrNull("url")
-  val scale get() = if (_scale.isString) _scale.content.toInt() else _scale.int
+  val name: String? get() = when(_name) {
+    is JsonNull -> if(tokenId == "0x00") "Minima" else null
+    is JsonPrimitive -> _name.jsonPrimitive.content
+    else -> _name.jsonStringOrNull("name") }
+  val url: String? get() = _name.jsonStringOrNull("url")
+  val scale: Int get() = if (_scale.isString) _scale.content.toInt() else _scale.int
 }
 
 @Serializable
