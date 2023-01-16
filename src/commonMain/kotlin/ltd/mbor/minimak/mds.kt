@@ -24,7 +24,12 @@ expect fun createClient(): HttpClient
  */
 expect fun log(output: String)
 
-object MDS {
+interface MDSInterface {
+  suspend fun cmd(command: String): JsonElement?
+  suspend fun sql(command: String): JsonElement?
+}
+
+object MDS: MDSInterface {
   
   //RPC Host for Minima
   var mainhost = ""
@@ -64,13 +69,13 @@ object MDS {
   /**
    * Runs a function on the Minima Command Line - same format as Minima
    */
-  suspend fun cmd(command: String) =
+  override suspend fun cmd(command: String) =
     httpPostAsync("${mainhost}cmd?uid=$minidappuid", command)
   
   /**
    * Runs a SQL command on this MiniDAPPs SQL Database
    */
-  suspend fun sql(command: String) =
+  override suspend fun sql(command: String) =
     httpPostAsync("${mainhost}sql?uid=$minidappuid", command)
       ?: if(command.startsWith("SELECT", ignoreCase = true)) httpPostAsync("${mainhost}sql?uid=$minidappuid", command)
       else null

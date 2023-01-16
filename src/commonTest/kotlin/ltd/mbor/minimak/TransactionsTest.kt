@@ -1,10 +1,8 @@
-package ltd.mbor
+package ltd.mbor.minimak
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ONE
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.TEN
-import ltd.mbor.minimak.Coin
-import ltd.mbor.minimak.ofAtLeast
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

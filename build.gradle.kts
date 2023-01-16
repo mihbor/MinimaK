@@ -75,6 +75,7 @@ kotlin {
     val commonTest by getting {
       dependencies {
         implementation(kotlin("test"))
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
       }
     }
     val jvmMain by getting {
@@ -88,7 +89,11 @@ kotlin {
         implementation("io.ktor:ktor-client-js:$ktorVersion")
       }
     }
-    val jsTest by getting
+    val jsTest by getting {
+      dependencies {
+        implementation(npm("file-system", "2.2.2"))
+      }
+    }
 //    val nativeMain by getting{
 //      dependencies {
 //        implementation("io.ktor:ktor-client-curl:$ktorVersion")

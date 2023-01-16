@@ -123,8 +123,11 @@ suspend fun MDS.exportCoin(coinId: String): String {
   return coinexport.jsonString("response")
 }
 
-suspend fun MDS.importCoin(data: String) {
-  val coinimport = cmd("coinimport data:$data")
+suspend fun MDSInterface.importCoin(data: String): Coin {
+  val coinimport = cmd("coinimport data:$data")!!
+  if (coinimport.jsonBoolean("status") == true) {
+    return json.decodeFromJsonElement(coinimport.jsonObject["response"]!!.jsonObject["coin"]!!)
+  } else throw MinimaException(coinimport.jsonStringOrNull("error"))
 }
 
 suspend fun MDS.getTxPoWs(address: String): JsonArray? {
