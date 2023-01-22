@@ -130,7 +130,7 @@ suspend fun MDSInterface.importCoin(data: String): Coin {
   } else throw MinimaException(coinimport.jsonStringOrNull("error"))
 }
 
-suspend fun MDS.getTxPoWs(address: String): JsonArray? {
+suspend fun MDSInterface.getTxPoWs(address: String): JsonArray? {
   val txnpow = cmd("txpow address:$address")!!
   return txnpow.jsonObject["response"]?.jsonArray
 }
@@ -140,13 +140,14 @@ suspend fun MDS.getTxPoW(txPoWId: String): JsonElement? {
   return txnpow.jsonObject["response"]
 }
 
-suspend fun MDS.getTransactions(address: String): List<Transaction>? = getTxPoWs(address)?.map{
-  json.decodeFromJsonElement(it.jsonObject["body"]!!.jsonObject["txn"]!!)
+suspend fun MDSInterface.getTransactions(address: String): List<Transaction>? = getTxPoWs(address)?.map{
+  it.toTransaction()
 }
 
-suspend fun MDS.getTransaction(txPoWId: String): Transaction? = getTxPoW(txPoWId)?.let{
-  json.decodeFromJsonElement(it.jsonObject["body"]!!.jsonObject["txn"]!!)
-}
+suspend fun MDS.getTransaction(txPoWId: String): Transaction? = getTxPoW(txPoWId)?.toTransaction()
+
+fun JsonElement.toTransaction(): Transaction = json.decodeFromJsonElement<Transaction>(jsonObject["body"]!!.jsonObject["txn"]!!)
+  .copy(header = json.decodeFromJsonElement(jsonObject["header"]!!))
 
 suspend fun MDS.getContacts(): List<Contact> {
   val maxcontacts = cmd("maxcontacts")!!

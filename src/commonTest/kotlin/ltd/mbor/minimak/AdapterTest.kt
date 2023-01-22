@@ -4,30 +4,32 @@ import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import ltd.mbor.minimak.resources.coinimport
+import ltd.mbor.minimak.resources.txpow
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
+import kotlin.test.assertNotNull
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AdapterTest {
   
   @Test
   fun importCoin_returns_error() = runTest{
-    //given:
+    //given
     val mds = SimulatedMDS.willReturn(coinimport.error)
-    //when:
+    //when
     val result = assertFails{ mds.importCoin("0x123") }
-    //then:
+    //then
     assertEquals(MinimaException("""Cannot invoke "org.minima.database.txpowtree.TxPoWTreeNode.isRelevantEntry(org.minima.database.mmr.MMREntryNumber)" because "node" is null"""), result)
   }
 
   @Test
   fun importCoin_returns_success() = runTest {
-    //given:
+    //given
     val mds = SimulatedMDS.willReturn(coinimport.success)
-    //when:
+    //when
     val result = mds.importCoin("0x123")
-    //then:
+    //then
     assertEquals(
       Coin(
         coinId="0xF735BCAC6726EB0EC4395BA572F1F9A27F3982BAEC27B738ABD1FD876F1E79D8",
@@ -42,5 +44,30 @@ class AdapterTest {
       ),
       result
     )
+  }
+  
+  @Test
+  fun txpow_with_address() = runTest {
+    //given
+    val mds = SimulatedMDS.willReturn(txpow.byAddress)
+    //when
+    val result = mds.getTransactions("some address")
+    //then
+    assertNotNull(result)
+    assertEquals(2, result.size)
+    
+    val first = result[0]
+    assertEquals("0xD4D1C007D23AC7D5508DA0FE63C79BB43D01D5905A7E7B1708BA02D515080F36", first.transactionId)
+    assertEquals(2, first.inputs.size)
+    assertEquals(3, first.outputs.size)
+    assertNotNull(first.header)
+    assertEquals(349299, first.header!!.block)
+    
+    val second = result[1]
+    assertEquals("0xDD526F0D0F59D5E92B98A3925A0429E68A02D01D82926BDF41E3A4D2754BAF1F", second.transactionId)
+    assertEquals(1, second.inputs.size)
+    assertEquals(2, second.outputs.size)
+    assertNotNull(second.header)
+    assertEquals(349298, second.header!!.block)
   }
 }
