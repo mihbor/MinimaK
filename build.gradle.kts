@@ -10,7 +10,7 @@ buildscript {
   }
   dependencies {
     classpath(kotlin("gradle-plugin", kotlin_version))
-    classpath("com.android.tools.build:gradle:7.2.0")
+    classpath("com.android.tools.build:gradle:7.3.0")
   }
 }
 
@@ -89,11 +89,7 @@ kotlin {
         implementation("io.ktor:ktor-client-js:$ktorVersion")
       }
     }
-    val jsTest by getting {
-      dependencies {
-        implementation(npm("file-system", "2.2.2"))
-      }
-    }
+    val jsTest by getting
 //    val nativeMain by getting{
 //      dependencies {
 //        implementation("io.ktor:ktor-client-curl:$ktorVersion")
@@ -102,7 +98,6 @@ kotlin {
 //    val nativeTest by getting
     val androidMain by getting {
       dependencies {
-        implementation("com.google.android.material:material:1.5.0")
         implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
       }
     }
@@ -116,7 +111,7 @@ kotlin {
 
 android {
   compileSdk = 33
-  sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+  namespace = "ltd.mbor.minimak"
   defaultConfig {
     minSdk = 21
     targetSdk = 33
