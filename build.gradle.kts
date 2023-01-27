@@ -1,29 +1,25 @@
-val kotlin_version: String by extra
-val ktorVersion = "2.2.1"
+val ktorVersion = "2.2.2"
 val bignumVersion = "0.3.7"
 
 buildscript {
-  var kotlin_version: String by extra
-  kotlin_version = "1.7.20"
   repositories {
     mavenCentral()
   }
   dependencies {
-    classpath(kotlin("gradle-plugin", kotlin_version))
     classpath("com.android.tools.build:gradle:7.3.0")
   }
 }
 
 plugins {
-  kotlin("multiplatform") version "1.7.20"
-  kotlin("plugin.serialization") version "1.7.20"
-  id("org.jetbrains.kotlin.android") version "1.7.20" apply false
+  kotlin("multiplatform")
+  kotlin("plugin.serialization")
+  id("org.jetbrains.kotlin.android") apply false
   id("com.android.library") version "7.4.0"
   id("maven-publish")
 }
 
 group = "ltd.mbor"
-version = "0.3-SNAPSHOT"
+version = "0.3"
 
 repositories {
   google()

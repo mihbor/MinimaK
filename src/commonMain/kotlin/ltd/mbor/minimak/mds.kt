@@ -24,12 +24,13 @@ expect fun createClient(): HttpClient
  */
 expect fun log(output: String)
 
-interface MDSInterface {
+interface MdsApi {
+  var logging: Boolean
   suspend fun cmd(command: String): JsonElement?
-  suspend fun sql(command: String): JsonElement?
+  suspend fun sql(query: String): JsonElement?
 }
 
-object MDS: MDSInterface {
+object MDS: MdsApi {
   
   //RPC Host for Minima
   var mainhost = ""
@@ -38,7 +39,7 @@ object MDS: MDSInterface {
   var minidappuid: String? = null
   
   //Is logging RPC enabled
-  var logging = false
+  override var logging = false
   
   val client = createClient()
   /**
@@ -75,9 +76,9 @@ object MDS: MDSInterface {
   /**
    * Runs a SQL command on this MiniDAPPs SQL Database
    */
-  override suspend fun sql(command: String) =
-    httpPostAsync("${mainhost}sql?uid=$minidappuid", command)
-      ?: if(command.startsWith("SELECT", ignoreCase = true)) httpPostAsync("${mainhost}sql?uid=$minidappuid", command)
+  override suspend fun sql(query: String) =
+    httpPostAsync("${mainhost}sql?uid=$minidappuid", query)
+      ?: if(query.startsWith("SELECT", ignoreCase = true)) httpPostAsync("${mainhost}sql?uid=$minidappuid", query)
       else null
   
   

@@ -12,52 +12,52 @@ data class Result(
   }
 }
 
-suspend fun MDS.getBlockNumber(): Int {
+suspend fun MdsApi.getBlockNumber(): Int {
   val status = cmd("status")!!
   return status.jsonObject["response"]!!.jsonObject["chain"]!!.jsonObject["block"]!!.jsonPrimitive.int
 }
 
-suspend fun MDS.getBalances(address: String? = null, confirmations: Int? = null): List<Balance> {
+suspend fun MdsApi.getBalances(address: String? = null, confirmations: Int? = null): List<Balance> {
   val balance = cmd("balance ${address?.let{ "address:$address " } ?:""}${confirmations?.let{ "confirmations:$confirmations " } ?:""}")!!
   return json.decodeFromJsonElement(balance.jsonObject["response"]!!)
 }
 
-suspend fun MDS.getTokens(): List<Token> {
+suspend fun MdsApi.getTokens(): List<Token> {
   val tokens = cmd("tokens")!!
   return json.decodeFromJsonElement(tokens.jsonObject["response"]!!)
 }
 
-suspend fun MDS.getScripts(): List<Address> {
+suspend fun MdsApi.getScripts(): List<Address> {
   val scripts = cmd("scripts")!!
   return json.decodeFromJsonElement(scripts.jsonObject["response"]!!)
 }
 
-suspend fun MDS.getScript(address: String): Address {
+suspend fun MdsApi.getScript(address: String): Address {
   val scripts = cmd("scripts address:$address")!!
   return json.decodeFromJsonElement(scripts.jsonObject["response"]!!)
 }
 
-suspend fun MDS.newScript(text: String, trackAll: Boolean = true): Address {
+suspend fun MdsApi.newScript(text: String, trackAll: Boolean = true): Address {
   val newscript = cmd("""newscript script:"$text" trackall:$trackAll""")!!
   return json.decodeFromJsonElement(newscript.jsonObject["response"]!!)
 }
 
-suspend fun MDS.getAddress(): Address {
+suspend fun MdsApi.getAddress(): Address {
   val getaddress = cmd("getaddress")!!
   return json.decodeFromJsonElement(getaddress.jsonObject["response"]!!)
 }
 
-suspend fun MDS.newAddress(): Address {
+suspend fun MdsApi.newAddress(): Address {
   val newaddress = cmd("newaddress")!!
   return json.decodeFromJsonElement(newaddress.jsonObject["response"]!!)
 }
 
-suspend fun MDS.newKey(): String {
+suspend fun MdsApi.newKey(): String {
   val keys = cmd("keys action:new")!!
   return keys.jsonObject["response"]!!.jsonString("publickey")
 }
 
-suspend fun MDS.getCoins(tokenId: String? = null, address: String? = null, coinId: String? = null, sendable: Boolean = false, relevant: Boolean = true): List<Coin> {
+suspend fun MdsApi.getCoins(tokenId: String? = null, address: String? = null, coinId: String? = null, sendable: Boolean = false, relevant: Boolean = true): List<Coin> {
   val coinSimple = cmd(buildString {
     append("coins")
     tokenId?.let { append(" tokenid:$tokenId") }
@@ -70,15 +70,15 @@ suspend fun MDS.getCoins(tokenId: String? = null, address: String? = null, coinI
   return coins.sortedBy { it.amount }
 }
 
-suspend fun MDS.createToken(name: String, supply: BigDecimal, decimals: Int, url: String? = null) =
+suspend fun MdsApi.createToken(name: String, supply: BigDecimal, decimals: Int, url: String? = null) =
   createToken(supply, decimals, name, url)
 
-suspend fun MDS.createToken(supply: BigDecimal, decimals: Int, name: String, url: String? = null, script: String? = null): Result {
+suspend fun MdsApi.createToken(supply: BigDecimal, decimals: Int, name: String, url: String? = null, script: String? = null): Result {
   val nameJson = JsonObject(listOfNotNull("name" to JsonPrimitive(name), url?.let{ "url" to JsonPrimitive(it) }).toMap())
   return createToken(supply, decimals, nameJson, script)
 }
 
-suspend fun MDS.createToken(supply: BigDecimal, decimals: Int, name: JsonElement, script: String? = null): Result {
+suspend fun MdsApi.createToken(supply: BigDecimal, decimals: Int, name: JsonElement, script: String? = null): Result {
   val tokencreate = buildString {
     append("tokencreate name:$name")
     append(" amount:${supply.toPlainString()}")
@@ -89,26 +89,26 @@ suspend fun MDS.createToken(supply: BigDecimal, decimals: Int, name: JsonElement
   return Result(result.jsonBoolean("status"), result.jsonStringOrNull("message"))
 }
 
-suspend fun MDS.signTx(txnId: Int, key: String): JsonElement? {
+suspend fun MdsApi.signTx(txnId: Int, key: String): JsonElement? {
   val txncreator = "txnsign id:$txnId publickey:$key;"
   val result = cmd(txncreator)
   if (logging) log("import ${result?.jsonBoolean("status")}")
   return result
 }
 
-suspend fun MDS.post(txnId: Int): JsonElement? {
+suspend fun MdsApi.post(txnId: Int): JsonElement? {
   val txncreator = "txnpost id:$txnId auto:true;"
   val result = cmd(txncreator)!!
   return result.jsonObject["response"]
 }
 
-suspend fun MDS.exportTx(txnId: Int): String {
+suspend fun MdsApi.exportTx(txnId: Int): String {
   val txncreator = "txnexport id:$txnId;"
   val result = cmd(txncreator)!!
   return result.jsonObject["response"]!!.jsonString("data")
 }
 
-suspend fun MDS.importTx(txnId: Int, data: String): Transaction {
+suspend fun MdsApi.importTx(txnId: Int, data: String): Transaction {
   val txncreator = buildString{
     appendLine("txncreate id:$txnId;")
     append("txnimport id:$txnId data:$data;")
@@ -118,57 +118,57 @@ suspend fun MDS.importTx(txnId: Int, data: String): Transaction {
   return json.decodeFromJsonElement(txnimport.jsonObject["response"]!!.jsonObject["transaction"]!!)
 }
 
-suspend fun MDS.exportCoin(coinId: String): String {
+suspend fun MdsApi.exportCoin(coinId: String): String {
   val coinexport = cmd("coinexport coinid:$coinId")!!
   return coinexport.jsonString("response")
 }
 
-suspend fun MDSInterface.importCoin(data: String): Coin {
+suspend fun MdsApi.importCoin(data: String): Coin {
   val coinimport = cmd("coinimport data:$data")!!
   if (coinimport.jsonBoolean("status") == true) {
     return json.decodeFromJsonElement(coinimport.jsonObject["response"]!!.jsonObject["coin"]!!)
   } else throw MinimaException(coinimport.jsonStringOrNull("error"))
 }
 
-suspend fun MDSInterface.getTxPoWs(address: String): JsonArray? {
+suspend fun MdsApi.getTxPoWs(address: String): JsonArray? {
   val txnpow = cmd("txpow address:$address")!!
   return txnpow.jsonObject["response"]?.jsonArray
 }
 
-suspend fun MDS.getTxPoW(txPoWId: String): JsonElement? {
+suspend fun MdsApi.getTxPoW(txPoWId: String): JsonElement? {
   val txnpow = cmd("txpow txpowid:$txPoWId")!!
   return txnpow.jsonObject["response"]
 }
 
-suspend fun MDSInterface.getTransactions(address: String): List<Transaction>? = getTxPoWs(address)?.map{
+suspend fun MdsApi.getTransactions(address: String): List<Transaction>? = getTxPoWs(address)?.map{
   it.toTransaction()
 }
 
-suspend fun MDS.getTransaction(txPoWId: String): Transaction? = getTxPoW(txPoWId)?.toTransaction()
+suspend fun MdsApi.getTransaction(txPoWId: String): Transaction? = getTxPoW(txPoWId)?.toTransaction()
 
 fun JsonElement.toTransaction(): Transaction = json.decodeFromJsonElement<Transaction>(jsonObject["body"]!!.jsonObject["txn"]!!)
   .copy(header = json.decodeFromJsonElement(jsonObject["header"]!!))
 
-suspend fun MDS.getContacts(): List<Contact> {
+suspend fun MdsApi.getContacts(): List<Contact> {
   val maxcontacts = cmd("maxcontacts")!!
   return json.decodeFromJsonElement(maxcontacts.jsonObject["response"]!!.jsonObject["contacts"]!!.jsonArray)
 }
 
-suspend fun MDS.addContact(maxiAddress: String): Contact? {
+suspend fun MdsApi.addContact(maxiAddress: String): Contact? {
   val maxcontacts = cmd("maxcontacts action:add contact:$maxiAddress")!!
   return if (maxcontacts.jsonBoolean("status") == true)
     getContacts().first{ it.currentAddress == maxiAddress }
   else null
 }
 
-suspend fun MDS.sendMessage(app: String, publicKey: String, text: String): Boolean {
+suspend fun MdsApi.sendMessage(app: String, publicKey: String, text: String): Boolean {
   val hex = "0x" + text.encodeToByteArray().toHex()
   val maxima = cmd("maxima action:send application:$app publickey:$publicKey data:$hex")!!
   log("sent: $text")
   return maxima.jsonBoolean("status") == true && maxima.jsonObject["response"]!!.jsonBoolean("delivered") == true
 }
 
-suspend fun MDS.hash(data: ByteArray, type: String = "keccak") = hash(data.toHex(), type)
+suspend fun MdsApi.hash(data: ByteArray, type: String = "keccak") = hash(data.toHex(), type)
 
-suspend fun MDS.hash(data: String, type: String = "keccak") =
+suspend fun MdsApi.hash(data: String, type: String = "keccak") =
   cmd("hash data:$data type:$type")!!.jsonObject["response"]!!.jsonString("hash")

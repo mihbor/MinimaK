@@ -4,10 +4,10 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.serialization.json.jsonArray
 import kotlin.random.Random
 
-suspend fun MDS.transact(inputCoinIds: List<String>, outputs: List<Output>, states: List<String>) =
-  MDS.transact(inputCoinIds, outputs, states.mapIndexed{ port, value -> port to value}.toMap())
+suspend fun MdsApi.transact(inputCoinIds: List<String>, outputs: List<Output>, states: List<String>) =
+  transact(inputCoinIds, outputs, states.mapIndexed{ port, value -> port to value}.toMap())
 
-suspend fun MDS.transact(inputCoinIds: List<String>, outputs: List<Output>, states: Map<Int, String> = emptyMap()): Result {
+suspend fun MdsApi.transact(inputCoinIds: List<String>, outputs: List<Output>, states: Map<Int, String> = emptyMap()): Result {
   val txId = Random.nextInt(1000000000)
   
   val commands = buildString {
@@ -33,15 +33,15 @@ suspend fun MDS.transact(inputCoinIds: List<String>, outputs: List<Output>, stat
   return Result(postResult?.jsonBoolean("status") == true, postResult?.jsonStringOrNull("message"))
 }
 
-suspend fun MDS.send(toAddress: String, amount: BigDecimal, tokenId: String, states: List<String>) =
-  MDS.send(toAddress, amount, tokenId, states.mapIndexed{ port, value -> port to value}.toMap()).isSuccessful
+suspend fun MdsApi.send(toAddress: String, amount: BigDecimal, tokenId: String, states: List<String>) =
+  send(toAddress, amount, tokenId, states.mapIndexed{ port, value -> port to value}.toMap()).isSuccessful
 
-suspend fun MDS.send(toAddress: String, amount: BigDecimal, tokenId: String, states: Map<Int, String> = emptyMap()): Result {
+suspend fun MdsApi.send(toAddress: String, amount: BigDecimal, tokenId: String, states: Map<Int, String> = emptyMap()): Result {
   val (inputs, outputs) = inputsWithChange(tokenId, amount)
   return transact(inputs.map{ it.coinId }, listOf(Output(toAddress, amount, tokenId, states.isNotEmpty())) + outputs, states)
 }
 
-suspend fun MDS.inputsWithChange(tokenId: String, amount: BigDecimal): Pair<List<Coin>, List<Output>> {
+suspend fun MdsApi.inputsWithChange(tokenId: String, amount: BigDecimal): Pair<List<Coin>, List<Output>> {
   val inputs = mutableListOf<Coin>()
   val outputs = mutableListOf<Output>()
   val coins = getCoins(tokenId = tokenId, sendable = true).ofAtLeast(amount)
