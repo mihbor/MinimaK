@@ -13,6 +13,7 @@ buildscript {
 plugins {
   kotlin("multiplatform")
   kotlin("plugin.serialization")
+  id("org.jetbrains.kotlinx.kover") version "0.6.1"
   id("org.jetbrains.kotlin.android") apply false
   id("com.android.library") version "7.4.0"
   id("maven-publish")
