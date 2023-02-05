@@ -20,7 +20,7 @@ plugins {
 }
 
 group = "ltd.mbor"
-version = "0.3"
+version = "0.3.1"
 
 repositories {
   google()
@@ -61,12 +61,12 @@ kotlin {
   sourceSets {
     val commonMain by getting {
       dependencies {
-        implementation("io.ktor:ktor-client-core:$ktorVersion")
+        api("io.ktor:ktor-client-core:$ktorVersion")
     
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+        api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
     
-        implementation("com.ionspin.kotlin:bignum:$bignumVersion")
-        implementation("com.ionspin.kotlin:bignum-serialization-kotlinx:$bignumVersion")
+        api("com.ionspin.kotlin:bignum:$bignumVersion")
+        api("com.ionspin.kotlin:bignum-serialization-kotlinx:$bignumVersion")
       }
     }
     val commonTest by getting {
