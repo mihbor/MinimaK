@@ -1,18 +1,42 @@
 package ltd.mbor.minimak
 
+import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonPrimitive
+import ltd.mbor.minimak.resources.balance
 import ltd.mbor.minimak.resources.coinimport
 import ltd.mbor.minimak.resources.txpow
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFails
-import kotlin.test.assertNotNull
+import kotlin.test.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AdapterTest {
-  
+
+  @Test
+  fun zero_balance() = runTest {
+    //given
+    val mds = SimulatedMDS.willReturn(balance.zero)
+    //when
+    val result = mds.getBalances()
+    //then
+    assertEquals(
+      listOf(Balance(
+        tokenId = "0x00",
+        _token = JsonPrimitive("Minima"),
+        total = "1000000000".toBigDecimal(),
+        confirmed = ZERO,
+        unconfirmed = ZERO,
+        sendable = ZERO,
+        _coins = "0"
+      )),
+      result
+    )
+    assertEquals("Minima", result.first().tokenName)
+    assertNull(result.first().tokenUrl)
+    assertEquals(0, result.first().coins)
+  }
+
   @Test
   fun importCoin_returns_error() = runTest{
     //given
@@ -45,7 +69,7 @@ class AdapterTest {
       result
     )
   }
-  
+
   @Test
   fun txpow_with_address() = runTest {
     //given
