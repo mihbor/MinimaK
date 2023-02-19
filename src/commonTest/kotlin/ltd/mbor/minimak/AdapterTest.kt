@@ -4,9 +4,11 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import ltd.mbor.minimak.resources.balance
 import ltd.mbor.minimak.resources.coinimport
+import ltd.mbor.minimak.resources.txnimport
 import ltd.mbor.minimak.resources.txpow
 import kotlin.test.*
 
@@ -93,5 +95,60 @@ class AdapterTest {
     assertEquals(2, second.outputs.size)
     assertNotNull(second.header)
     assertEquals(349298, second.header!!.block)
+  }
+
+  @Test
+  fun create_and_import_signed_tx() = runTest {
+    //given
+    val mds = SimulatedMDS.willReturn(txnimport.createAndImportSignedTx)
+    //when
+    val result = mds.importTx(399674040, txnimport.signedTxData)
+    //then
+    assertNotNull(result)
+    assertEquals("0xBDD499ED70C508791A2BCFA6D477A4D570A81DC27B9AF2214B9356E8814C5112", result.transactionId)
+    assertEquals(1, result.inputs.size)
+    assertEquals(
+      Coin(
+        address = "0xB13D03D7FAC25552491F8E1C04120FEA67700DFB5AB576CA7DDED59D35F93A96",
+        miniAddress = "MxG085H7K1TFUM2AY94W7SE3G2143VACTZ0RUQQMYRCKVEUQMEJBU9QWPPERECZ",
+        amount = "40.1".toBigDecimal(),
+        tokenAmount = "40.1".toBigDecimal(),
+        coinId = "0x01",
+        storeState = true,
+        tokenId = "0x8EA80F001433D4CB4EB466A7C4C6D3E99D0DC244F73AE2691B2F5AC8438004DB",
+        token = null,
+        _created = "0",
+        state = emptyList()
+      ),
+      result.inputs.first()
+    )
+    assertEquals(1, result.outputs.size)
+    assertEquals(
+      Coin(
+        address = "0xB13D03D7FAC25552491F8E1C04120FEA67700DFB5AB576CA7DDED59D35F93A96",
+        miniAddress = "MxG085H7K1TFUM2AY94W7SE3G2143VACTZ0RUQQMYRCKVEUQMEJBU9QWPPERECZ",
+        amount = "0.0000000000000000000000000000000000401".toBigDecimal(),
+        tokenAmount = "40.1".toBigDecimal(),
+        coinId = "0x00",
+        storeState = true,
+        tokenId = "0x8EA80F001433D4CB4EB466A7C4C6D3E99D0DC244F73AE2691B2F5AC8438004DB",
+        token = Token(
+          tokenId = "0x8EA80F001433D4CB4EB466A7C4C6D3E99D0DC244F73AE2691B2F5AC8438004DB",
+          _name = JsonObject(mapOf(
+            "name" to JsonPrimitive("PigCoin"),
+            "url" to JsonPrimitive("https://uxwing.com/wp-content/themes/uxwing/download/food-and-drinks/pork-icon.png")
+          )),
+          total = "1000000000".toBigDecimal(),
+          decimals = 8,
+          script = "RETURN TRUE",
+          coinId = "0x07DE61C15BFBD6104C90974EDEB9047C61366CC712D0E890D3DDD101A620CFCC",
+          totalAmount = "0.000000000000000000000000001".toBigDecimal(),
+          _scale = JsonPrimitive("36")
+        ),
+        _created = "0",
+        state = emptyList()
+      ),
+      result.outputs.first()
+    )
   }
 }

@@ -42,7 +42,7 @@ data class Token(
   val script: String? = null,
   @JsonNames("coinid")
   val coinId: String? = null,
-  @JsonNames("tokenamount")
+  @JsonNames("totalamount")
   val totalAmount: BigDecimal? = null,
   @JsonNames("scale")
   val _scale: JsonPrimitive
