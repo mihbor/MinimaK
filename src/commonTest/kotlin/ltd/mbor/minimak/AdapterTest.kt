@@ -169,4 +169,14 @@ class AdapterTest {
       result
     )
   }
+
+  @Test
+  fun get_109_scripts() = runTest {
+    //given
+    val mds = SimulatedMDS.willReturn(scripts.scripts109)
+    //when
+    val result = mds.getScripts()
+    //then
+    assertEquals(109, result.size)
+  }
 }
