@@ -6,10 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
-import ltd.mbor.minimak.resources.balance
-import ltd.mbor.minimak.resources.coinimport
-import ltd.mbor.minimak.resources.txnimport
-import ltd.mbor.minimak.resources.txpow
+import ltd.mbor.minimak.resources.*
 import kotlin.test.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -149,6 +146,27 @@ class AdapterTest {
         state = emptyList()
       ),
       result.outputs.first()
+    )
+  }
+
+  @Test
+  fun getAddress() = runTest {
+    //given
+    val mds = SimulatedMDS.willReturn(address.getAddress)
+    //when
+    val result = mds.getAddress()
+    //then
+    assertEquals(
+      Address(
+        script = "RETURN SIGNEDBY(0xADF476577F854345C4D9225948FA0A26CCA5F6DD40556A4EBFC5A8958EE7BF5C)",
+        address = "0xB4A680430A9808AFA98D9F7E3398750AA71DD88E1A815D87C4FCC2A48C0A57D8",
+        miniAddress = "MxG085KKQ0462KZ12NQJ3CVFZPPGT8AKSETH3GQG5EZFH7SZAW8Z2WNR2HBV922",
+        simple = true,
+        default = true,
+        publicKey = "0xADF476577F854345C4D9225948FA0A26CCA5F6DD40556A4EBFC5A8958EE7BF5C",
+        track = true
+      ),
+      result
     )
   }
 }

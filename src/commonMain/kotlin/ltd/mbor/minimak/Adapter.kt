@@ -92,7 +92,7 @@ suspend fun MdsApi.createToken(supply: BigDecimal, decimals: Int, name: JsonElem
 suspend fun MdsApi.signTx(txnId: Int, key: String): JsonElement? {
   val txncreator = "txnsign id:$txnId publickey:$key;"
   val result = cmd(txncreator)
-  if (logging) log("import ${result?.jsonBoolean("status")}")
+  if (logging) log("txnsign ${result?.jsonBoolean("status")}")
   return result
 }
 

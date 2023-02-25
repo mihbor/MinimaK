@@ -1,0 +1,5 @@
+package ltd.mbor.minimak.resources
+
+object address {
+  const val getAddress = """{"command":"getaddress","status":true,"pending":false,"response":{"script":"RETURN SIGNEDBY(0xADF476577F854345C4D9225948FA0A26CCA5F6DD40556A4EBFC5A8958EE7BF5C)","address":"0xB4A680430A9808AFA98D9F7E3398750AA71DD88E1A815D87C4FCC2A48C0A57D8","miniaddress":"MxG085KKQ0462KZ12NQJ3CVFZPPGT8AKSETH3GQG5EZFH7SZAW8Z2WNR2HBV922","simple":true,"default":true,"publickey":"0xADF476577F854345C4D9225948FA0A26CCA5F6DD40556A4EBFC5A8958EE7BF5C","track":true}}"""
+}
