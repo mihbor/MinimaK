@@ -188,5 +188,17 @@ class AdapterTest {
     val result = mds.getScripts()
     //then
     assertEquals(109, result.size)
+    assertEquals(
+      Address(
+        script = "RETURN SIGNEDBY(0xB3C8B10782B90C1820111CBE33E207BDF2B7D4C4FF004E5EF38F301847EB2ED8)",
+        address = "0x3DD886A5FF072F44A576829B32019DB4DB98BF8E37FD819CA59798A3C2FDDBE9",
+        miniAddress = "MxG081TR23ABVZ75T2AATK2JCP037DKRECBV3HNVM0PP9CNJ2HS5VERT4GUC94G",
+        simple = true,
+        default = true,
+        publicKey = "0xB3C8B10782B90C1820111CBE33E207BDF2B7D4C4FF004E5EF38F301847EB2ED8",
+        track = true
+      ),
+      result.first()
+    )
   }
 }
