@@ -2,21 +2,27 @@ package ltd.mbor.minimak
 
 import kotlinx.serialization.json.JsonElement
 
-object SimulatedMDS: MdsApi {
-  var payload: JsonElement? = null
+class SimulatedMDS: MdsApi {
+  var payloads: MutableList<JsonElement?> = mutableListOf()
+  var iterator = payloads.iterator()
+  var capturedCommands = mutableListOf<String>()
+  var capturedQueries = mutableListOf<String>()
   
   fun willReturn(payload: String): SimulatedMDS {
-    this.payload = json.parseToJsonElement(payload)
+    payloads += payload.let(json::parseToJsonElement)
+    iterator = payloads.iterator()
     return this
   }
   
   override var logging: Boolean = false
   
   override suspend fun cmd(command: String): JsonElement? {
-    return payload
+    capturedCommands += command
+    return iterator.next()
   }
   
   override suspend fun sql(query: String): JsonElement? {
-    return payload
+    capturedQueries += query
+    return iterator.next()
   }
 }

@@ -15,7 +15,7 @@ class AdapterTest {
   @Test
   fun zero_balance() = runTest {
     //given
-    val mds = SimulatedMDS.willReturn(balance.zero)
+    val mds = SimulatedMDS().willReturn(balance.zero)
     //when
     val result = mds.getBalances()
     //then
@@ -39,7 +39,7 @@ class AdapterTest {
   @Test
   fun importCoin_returns_error() = runTest{
     //given
-    val mds = SimulatedMDS.willReturn(coinimport.error)
+    val mds = SimulatedMDS().willReturn(coinimport.error)
     //when
     val result = assertFails{ mds.importCoin("0x123") }
     //then
@@ -49,7 +49,7 @@ class AdapterTest {
   @Test
   fun importCoin_returns_success() = runTest {
     //given
-    val mds = SimulatedMDS.willReturn(coinimport.success)
+    val mds = SimulatedMDS().willReturn(coinimport.success)
     //when
     val result = mds.importCoin("0x123")
     //then
@@ -72,7 +72,7 @@ class AdapterTest {
   @Test
   fun exportCoin() = runTest {
     //given
-    val mds = SimulatedMDS.willReturn(coinexport.coinexport)
+    val mds = SimulatedMDS().willReturn(coinexport.coinexport)
     //when
     val result = mds.exportCoin("0xCFFDBD5B01ECEE15EDD71196AEA8102BBFDDE64F03F47C06EBDF2EDC1764D87B")
     //then
@@ -82,7 +82,7 @@ class AdapterTest {
   @Test
   fun txpow_with_address() = runTest {
     //given
-    val mds = SimulatedMDS.willReturn(txpow.byAddress)
+    val mds = SimulatedMDS().willReturn(txpow.byAddress)
     //when
     val result = mds.getTransactions("some address")
     //then
@@ -107,7 +107,7 @@ class AdapterTest {
   @Test
   fun create_and_import_signed_tx() = runTest {
     //given
-    val mds = SimulatedMDS.willReturn(txnimport.createAndImportSignedTx)
+    val mds = SimulatedMDS().willReturn(txnimport.createAndImportSignedTx)
     //when
     val result = mds.importTx(399674040, txnimport.signedTxData)
     //then
@@ -162,7 +162,7 @@ class AdapterTest {
   @Test
   fun getAddress() = runTest {
     //given
-    val mds = SimulatedMDS.willReturn(address.getAddress)
+    val mds = SimulatedMDS().willReturn(address.getAddress)
     //when
     val result = mds.getAddress()
     //then
@@ -183,7 +183,7 @@ class AdapterTest {
   @Test
   fun get_109_scripts() = runTest {
     //given
-    val mds = SimulatedMDS.willReturn(scripts.scripts109)
+    val mds = SimulatedMDS().willReturn(scripts.scripts109)
     //when
     val result = mds.getScripts()
     //then
