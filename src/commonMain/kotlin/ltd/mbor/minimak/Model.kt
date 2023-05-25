@@ -152,6 +152,23 @@ data class ExtraData(
 }
 
 @Serializable
+data class MaximaInfo(
+  val contact: String,
+  @JsonNames("localidentity")
+  val localIdentity: String,
+  val logs: Boolean,
+  val mls: String,
+  val name: String,
+  @JsonNames("p2pidentity")
+  val p2pIdentity: String,
+  val poll: Int,
+  @JsonNames("publickey")
+  val publicKey: String,
+  @JsonNames("staticmls")
+  val staticMls: Boolean
+)
+
+@Serializable
 data class Address(
   val script: String,
   val address: String,

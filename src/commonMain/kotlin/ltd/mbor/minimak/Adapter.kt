@@ -157,8 +157,18 @@ suspend fun MdsApi.getContacts(): List<Contact> {
 suspend fun MdsApi.addContact(maxiAddress: String): Contact? {
   val maxcontacts = cmd("maxcontacts action:add contact:$maxiAddress")!!
   return if (maxcontacts.jsonBoolean("status") == true)
-    getContacts().first{ it.currentAddress == maxiAddress }
+    getContacts().find{ it.currentAddress == maxiAddress }
   else null
+}
+
+suspend fun MdsApi.getMaximaInfo(): MaximaInfo {
+  val maxima = cmd("maxima")!!
+  return json.decodeFromJsonElement(maxima.jsonObject["response"]!!)
+}
+
+suspend fun MdsApi.setMaximaName(name: String): String {
+  val maxima = cmd("maxima action:setname name:$name")!!
+  return maxima.jsonObject["response"]!!.jsonString("name")
 }
 
 suspend fun MdsApi.sendMessage(app: String, publicKey: String, text: String): Boolean {
