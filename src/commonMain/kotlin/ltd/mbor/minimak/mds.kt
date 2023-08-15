@@ -6,6 +6,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.*
@@ -42,6 +43,8 @@ object MDS: MdsApi {
   override var logging = false
   
   val client = createClient()
+
+  var pollingJob: Job? = null
   /**
    * Minima Startup - with the callback function used for all Minima messages
    */
@@ -58,7 +61,8 @@ object MDS: MdsApi {
     
     //Start the Long Poll listener
     with(CoroutineScope(coroutineContext)) {
-      launch {
+      pollingJob?.cancel()
+      pollingJob = launch {
         PollListener()
       }
     }
@@ -86,7 +90,11 @@ object MDS: MdsApi {
    * Post a message to the Minima Event Listeners
    */
   private suspend fun MDSPostMessage(data: JsonElement){
-    MDS_MAIN_CALLBACK?.invoke(data)
+    try {
+      MDS_MAIN_CALLBACK?.invoke(data)
+    } catch (e: Exception) {
+      log("Exception in message callback: ${e.message}")
+    }
   }
   
   var PollCounter = 0
@@ -103,7 +111,7 @@ object MDS: MdsApi {
   
   private suspend fun PollListener() {
     
-    val pollhost = "${MDS.mainhost}poll?uid=${MDS.minidappuid}"
+    val pollhost = "${mainhost}poll?uid=$minidappuid"
     val polldata = "series=$PollSeries&counter=$PollCounter"
     
     httpPostAsyncPoll(pollhost, polldata) { msg: JsonElement ->
