@@ -5,7 +5,7 @@ import kotlinx.serialization.json.jsonArray
 import kotlin.random.Random
 
 suspend fun MdsApi.transact(inputCoinIds: List<String>, outputs: List<Output>, states: List<String>) =
-  transact(inputCoinIds, outputs, states.mapIndexed{ port, value -> port to value}.toMap())
+  transact(inputCoinIds, outputs, states.mapIndexed{ port, value -> port to value }.toMap())
 
 suspend fun MdsApi.transact(inputCoinIds: List<String>, outputs: List<Output>, states: Map<Int, String> = emptyMap()): Result {
   val txId = Random.nextInt(1000000000)
@@ -23,18 +23,16 @@ suspend fun MdsApi.transact(inputCoinIds: List<String>, outputs: List<Output>, s
     states.forEach{ (port, value) ->
       appendLine("txnstate id:$txId port:$port value:$value;")
     }
-    appendLine("txnsign id:$txId publickey:auto;")
-    appendLine("txnpost id:$txId auto:true;")
-    append("txndelete id:$txId;")
+    append("txnsign id:$txId publickey:auto txnpostauto:true txndelete:true;")
   }
   
   val results = cmd(commands)!!.jsonArray
-  val postResult = results.find{ it.jsonString("command") == "txnpost" }
-  return Result(postResult?.jsonBoolean("status") == true, postResult?.jsonStringOrNull("message"))
+  val postResult = results.find{ it.jsonString("command") == "txnsign" }
+  return Result(postResult?.jsonBoolean("status") == true, postResult?.jsonStringOrNull("error"))
 }
 
 suspend fun MdsApi.send(toAddress: String, amount: BigDecimal, tokenId: String, states: List<String>) =
-  send(toAddress, amount, tokenId, states.mapIndexed{ port, value -> port to value}.toMap()).isSuccessful
+  send(toAddress, amount, tokenId, states.mapIndexed{ port, value -> port to value }.toMap())
 
 suspend fun MdsApi.send(toAddress: String, amount: BigDecimal, tokenId: String, states: Map<Int, String> = emptyMap()): Result {
   val (inputs, outputs) = inputsWithChange(tokenId, amount)

@@ -20,7 +20,7 @@ plugins {
 }
 
 group = "ltd.mbor"
-version = "0.3.5"
+version = "0.4-SNAPSHOT"
 
 repositories {
   google()

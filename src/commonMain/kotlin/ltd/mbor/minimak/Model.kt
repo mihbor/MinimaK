@@ -180,3 +180,15 @@ data class Address(
   val publicKey: String,
   val track: Boolean
 )
+
+@Serializable
+data class Key(
+  @JsonNames("publickey")
+  val publicKey: String,
+  val modifier: String,
+  val size: Int,
+  val depth: Int,
+  val uses: Int,
+  @JsonNames("maxuses")
+  val maxUses: Int
+)

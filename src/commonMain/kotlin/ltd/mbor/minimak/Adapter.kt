@@ -17,8 +17,13 @@ suspend fun MdsApi.getBlockNumber(): Int {
   return status.jsonObject["response"]!!.jsonObject["chain"]!!.jsonObject["block"]!!.jsonPrimitive.int
 }
 
-suspend fun MdsApi.getBalances(address: String? = null, confirmations: Int? = null): List<Balance> {
-  val balance = cmd("balance ${address?.let{ "address:$address " } ?:""}${confirmations?.let{ "confirmations:$confirmations " } ?:""}")!!
+suspend fun MdsApi.getBalance(address: String? = null, tokenId: String, confirmations: Int? = null): Balance? {
+  val balance = cmd("balance ${address?.let{ "address:$address " } ?:""}tokenid:$tokenId ${confirmations?.let{ "confirmations:$confirmations " } ?:""}")!!
+  return json.decodeFromJsonElement<List<Balance>>(balance.jsonObject["response"]!!).firstOrNull()
+}
+
+suspend fun MdsApi.getBalances(address: String? = null, tokenId: String? = null, confirmations: Int? = null): List<Balance> {
+  val balance = cmd("balance ${address?.let{ "address:$address " } ?:""}${tokenId?.let{ "tokenid:$tokenId " } ?:""}${confirmations?.let{ "confirmations:$confirmations " } ?:""}")!!
   return json.decodeFromJsonElement(balance.jsonObject["response"]!!)
 }
 
@@ -52,9 +57,24 @@ suspend fun MdsApi.newAddress(): Address {
   return json.decodeFromJsonElement(newaddress.jsonObject["response"]!!)
 }
 
-suspend fun MdsApi.newKey(): String {
+suspend fun MdsApi.checkAddress(address: String): Boolean {
+  val checkaddress = cmd("checkaddress address:$address")!!
+  return checkaddress.jsonObject["response"]?.jsonBooleanOrNull("relevant") ?: false
+}
+
+suspend fun MdsApi.newKey(): Key {
   val keys = cmd("keys action:new")!!
-  return keys.jsonObject["response"]!!.jsonString("publickey")
+  return json.decodeFromJsonElement(keys.jsonObject["response"]!!)
+}
+
+suspend fun MdsApi.getKeys(): List<Key> {
+  val keys = cmd("keys")!!
+  return json.decodeFromJsonElement<List<Key>>(keys.jsonObject["response"]!!.jsonObject["keys"]!!)
+}
+
+suspend fun MdsApi.getKey(key: String): Key? {
+  val keys = cmd("keys publickey:$key")!!
+  return json.decodeFromJsonElement<List<Key>>(keys.jsonObject["response"]!!.jsonObject["keys"]!!).firstOrNull()
 }
 
 suspend fun MdsApi.getCoins(tokenId: String? = null, address: String? = null, coinId: String? = null, sendable: Boolean = false, relevant: Boolean = true): List<Coin> {
@@ -94,6 +114,14 @@ suspend fun MdsApi.signTx(txnId: Int, key: String): JsonElement? {
   val result = cmd(txncreator)
   if (logging) log("txnsign ${result?.jsonBoolean("status")}")
   return result
+}
+
+suspend fun MdsApi.signData(data: String, key: String): String? {
+  val hex = "0x" + data.encodeToByteArray().toHex()
+  val txncreator = "sign data:$hex publickey:$key;"
+  val result = cmd(txncreator)!!
+  if (logging) log("sign ${result.jsonBoolean("status")}")
+  return result.jsonStringOrNull("response")
 }
 
 suspend fun MdsApi.post(txnId: Int): JsonElement? {
@@ -174,7 +202,7 @@ suspend fun MdsApi.setMaximaName(name: String): String {
 suspend fun MdsApi.sendMessage(app: String, publicKey: String, text: String): Boolean {
   val hex = "0x" + text.encodeToByteArray().toHex()
   val maxima = cmd("maxima action:send application:$app publickey:$publicKey data:$hex")!!
-  log("sent: $text")
+  log("sent ${text.length} chars: $text")
   return maxima.jsonBoolean("status") == true && maxima.jsonObject["response"]!!.jsonBoolean("delivered") == true
 }
 
