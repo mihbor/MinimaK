@@ -29,6 +29,8 @@ interface MdsApi {
   var logging: Boolean
   suspend fun cmd(command: String): JsonElement?
   suspend fun sql(query: String): JsonElement?
+  suspend fun get(url: String): JsonElement?
+  suspend fun post(url: String, data: String): JsonElement?
 }
 
 object MDS: MdsApi {
@@ -70,13 +72,13 @@ object MDS: MdsApi {
     log("MDS init complete")
     MDSPostMessage(JsonObject(mapOf("event" to JsonPrimitive("inited"))))
   }
-  
+
   /**
    * Runs a function on the Minima Command Line - same format as Minima
    */
   override suspend fun cmd(command: String) =
     httpPostAsync("${mainhost}cmd?uid=$minidappuid", command)
-  
+
   /**
    * Runs a SQL command on this MiniDAPPs SQL Database
    */
@@ -84,8 +86,19 @@ object MDS: MdsApi {
     httpPostAsync("${mainhost}sql?uid=$minidappuid", query)
       ?: if(query.startsWith("SELECT", ignoreCase = true)) httpPostAsync("${mainhost}sql?uid=$minidappuid", query)
       else null
-  
-  
+
+  /**
+   * Make a GET request
+   */
+  override suspend fun get(url: String): JsonElement? =
+    httpPostAsync("${mainhost}net?uid=$minidappuid", url)
+
+  /**
+   * Make a POST request
+   */
+  override suspend fun post(url: String, data: String): JsonElement? =
+    httpPostAsync("${mainhost}netpost?uid=$minidappuid", "$url&$data")
+
   /**
    * Post a message to the Minima Event Listeners
    */
