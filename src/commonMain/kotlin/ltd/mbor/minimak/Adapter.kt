@@ -110,18 +110,30 @@ suspend fun MdsApi.createToken(supply: BigDecimal, decimals: Int, name: JsonElem
 }
 
 suspend fun MdsApi.signTx(txnId: Int, key: String): JsonElement? {
-  val txncreator = "txnsign id:$txnId publickey:$key;"
-  val result = cmd(txncreator)
+  val txnsign = "txnsign id:$txnId publickey:$key;"
+  val result = cmd(txnsign)
   if (logging) log("txnsign ${result?.jsonBoolean("status")}")
   return result
 }
 
 suspend fun MdsApi.signData(data: String, key: String): String? {
   val hex = "0x" + data.encodeToByteArray().toHex()
-  val txncreator = "sign data:$hex publickey:$key;"
-  val result = cmd(txncreator)!!
+  val sign = "sign data:$hex publickey:$key;"
+  val result = cmd(sign)!!
   if (logging) log("sign ${result.jsonBoolean("status")}")
   return result.jsonStringOrNull("response")
+}
+
+suspend fun MdsApi.verify(data: String, key: String, signature: String): Boolean {
+  val hex = "0x" + data.encodeToByteArray().toHex()
+  val verify = "verify data:$hex publickey:$key signature:$signature;"
+  val result = cmd(verify)!!
+  val status = result.jsonBooleanOrNull("status")
+  if (logging) log("verify ${result.jsonBoolean("status")}")
+  if (status != true) {
+    log("verify: ${result.jsonStringOrNull("message")}")
+  }
+  return status ?: false
 }
 
 suspend fun MdsApi.post(txnId: Int): JsonElement? {
