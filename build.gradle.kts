@@ -64,9 +64,7 @@ kotlin {
     val commonMain by getting {
       dependencies {
         api("io.ktor:ktor-client-core:$ktorVersion")
-    
-        api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
-    
+        api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
         api("com.ionspin.kotlin:bignum:$bignumVersion")
         api("com.ionspin.kotlin:bignum-serialization-kotlinx:$bignumVersion")
       }
