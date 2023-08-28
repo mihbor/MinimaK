@@ -7,7 +7,12 @@ import kotlin.random.Random
 suspend fun MdsApi.transact(inputCoinIds: List<String>, outputs: List<Output>, states: List<String>) =
   transact(inputCoinIds, outputs, states.mapIndexed{ port, value -> port to value }.toMap())
 
-suspend fun MdsApi.transact(inputCoinIds: List<String>, outputs: List<Output>, states: Map<Int, String> = emptyMap()): Result {
+suspend fun MdsApi.transact(
+  inputCoinIds: List<String>,
+  outputs: List<Output>,
+  states: Map<Int, String> = emptyMap(),
+  publicKey: String = "auto"
+): Result {
   val txId = Random.nextInt(1000000000)
   
   val commands = buildString {
@@ -23,7 +28,7 @@ suspend fun MdsApi.transact(inputCoinIds: List<String>, outputs: List<Output>, s
     states.forEach{ (port, value) ->
       appendLine("txnstate id:$txId port:$port value:$value;")
     }
-    append("txnsign id:$txId publickey:auto txnpostauto:true txndelete:true;")
+    append("txnsign id:$txId publickey:$publicKey txnpostauto:true txndelete:true;")
   }
   
   val results = cmd(commands)!!.jsonArray
