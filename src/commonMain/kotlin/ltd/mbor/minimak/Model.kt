@@ -169,6 +169,20 @@ data class MaximaInfo(
 )
 
 @Serializable
+data class MaximaMessage(
+  val from: String,
+  val to: String,
+  val time: String,
+  @JsonNames("timemilli")
+  val timeMilli: Long,
+  val random: String,
+  val application: String,
+  val data: String,
+  @JsonNames("msgid")
+  val msgId: String
+)
+
+@Serializable
 data class Address(
   val script: String,
   val address: String,
