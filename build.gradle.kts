@@ -1,3 +1,6 @@
+group = "ltd.mbor"
+version = "0.4"
+
 val ktorVersion = "2.2.4"
 val bignumVersion = "0.3.8"
 
@@ -18,9 +21,6 @@ plugins {
   id("com.android.library") version "7.4.0"
   id("maven-publish")
 }
-
-group = "ltd.mbor"
-version = "0.4-SNAPSHOT"
 
 repositories {
   google()
