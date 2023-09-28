@@ -6,11 +6,12 @@ import kotlin.js.Date
 
 actual external fun encodeURIComponent(data: String): String
 
-/**
- * Log some data with a timestamp in a consistent manner to the console
- */
 actual fun log(output: String){
-  console.log("Minima @ ${Date().toLocaleString()} : $output")
+  try {
+    console.log("Minima @ ${Date().toLocaleString()} : $output")
+  } catch (e: Throwable) {
+    // can't do anything if console is not defined in the environment
+  }
 }
 
 actual fun createClient() = HttpClient(Js)
