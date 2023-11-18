@@ -1,8 +1,12 @@
 package ltd.mbor.minimak
 
-import io.ktor.client.*
-import io.ktor.client.engine.js.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.js.Js
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.decodeFromDynamic
+import kotlin.coroutines.suspendCoroutine
 import kotlin.js.Date
+import kotlin.Result
 
 actual external fun encodeURIComponent(data: String): String
 
@@ -15,3 +19,58 @@ actual fun log(output: String){
 }
 
 actual fun createClient() = HttpClient(Js)
+
+@JsName("MDS")
+external object DynamicMDS {
+  fun init(callback: dynamic)
+  fun log(output: String)
+  fun sql(query: String, callback: (dynamic) -> Unit)
+  fun cmd(command: String, callback: (dynamic) -> Unit)
+  object net {
+    fun GET(url: String, callback: (dynamic) -> Unit)
+    fun POST(url: String, data: String, callback: (dynamic) -> Unit)
+  }
+}
+
+object ServiceMDS: MdsApi {
+  override var logging: Boolean = false
+
+  fun init(callback: (JsonElement) -> Unit) = DynamicMDS.init{ msg: dynamic ->
+    DynamicMDS.log("init: ${JSON.stringify(msg)}")
+    callback(json.decodeFromDynamic(msg))
+  }
+
+  fun log(output: String) = DynamicMDS.log(output)
+
+  override suspend fun cmd(command: String): JsonElement? {
+    return suspendCoroutine { cont ->
+      DynamicMDS.cmd(command) { result ->
+        cont.resumeWith(Result.success(json.decodeFromDynamic(result)))
+      }
+    }
+  }
+
+  override suspend fun sql(query: String): JsonElement? {
+    return suspendCoroutine { cont ->
+      DynamicMDS.sql(query) { result ->
+        cont.resumeWith(Result.success(json.decodeFromDynamic(result)))
+      }
+    }
+  }
+
+  override suspend fun get(url: String): JsonElement? {
+    return suspendCoroutine { cont ->
+      DynamicMDS.net.GET(url) { result ->
+        cont.resumeWith(Result.success(json.decodeFromDynamic(result)))
+      }
+    }
+  }
+
+  override suspend fun post(url: String, data: String): JsonElement? {
+    return suspendCoroutine { cont ->
+      DynamicMDS.net.POST(url, data) { result ->
+        cont.resumeWith(Result.success(json.decodeFromDynamic(result)))
+      }
+    }
+  }
+}
