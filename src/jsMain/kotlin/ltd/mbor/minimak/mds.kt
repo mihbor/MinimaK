@@ -3,7 +3,6 @@ package ltd.mbor.minimak
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.js.Js
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.decodeFromDynamic
 import kotlin.coroutines.suspendCoroutine
 import kotlin.js.Date
 import kotlin.Result
@@ -22,7 +21,7 @@ actual fun createClient() = HttpClient(Js)
 
 @JsName("MDS")
 external object DynamicMDS {
-  fun init(callback: dynamic)
+  fun init(callback: (dynamic) -> Unit)
   fun log(output: String)
   fun sql(query: String, callback: (dynamic) -> Unit)
   fun cmd(command: String, callback: (dynamic) -> Unit)
@@ -37,7 +36,7 @@ object ServiceMDS: MdsApi {
 
   fun init(callback: (JsonElement) -> Unit) = DynamicMDS.init{ msg: dynamic ->
     DynamicMDS.log("init: ${JSON.stringify(msg)}")
-    callback(json.decodeFromDynamic(msg))
+    callback(json.decodeFromString<JsonElement>(JSON.stringify(msg)))
   }
 
   fun log(output: String) = DynamicMDS.log(output)
@@ -45,7 +44,7 @@ object ServiceMDS: MdsApi {
   override suspend fun cmd(command: String): JsonElement? {
     return suspendCoroutine { cont ->
       DynamicMDS.cmd(command) { result ->
-        cont.resumeWith(Result.success(json.decodeFromDynamic(result)))
+        cont.resumeWith(Result.success(json.decodeFromString<JsonElement>(JSON.stringify(result))))
       }
     }
   }
@@ -53,7 +52,7 @@ object ServiceMDS: MdsApi {
   override suspend fun sql(query: String): JsonElement? {
     return suspendCoroutine { cont ->
       DynamicMDS.sql(query) { result ->
-        cont.resumeWith(Result.success(json.decodeFromDynamic(result)))
+        cont.resumeWith(Result.success(json.decodeFromString<JsonElement>(JSON.stringify(result))))
       }
     }
   }
@@ -61,7 +60,7 @@ object ServiceMDS: MdsApi {
   override suspend fun get(url: String): JsonElement? {
     return suspendCoroutine { cont ->
       DynamicMDS.net.GET(url) { result ->
-        cont.resumeWith(Result.success(json.decodeFromDynamic(result)))
+        cont.resumeWith(Result.success(json.decodeFromString<JsonElement>(JSON.stringify(result))))
       }
     }
   }
@@ -69,7 +68,7 @@ object ServiceMDS: MdsApi {
   override suspend fun post(url: String, data: String): JsonElement? {
     return suspendCoroutine { cont ->
       DynamicMDS.net.POST(url, data) { result ->
-        cont.resumeWith(Result.success(json.decodeFromDynamic(result)))
+        cont.resumeWith(Result.success(json.decodeFromString<JsonElement>(JSON.stringify(result))))
       }
     }
   }

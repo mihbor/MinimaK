@@ -10,3 +10,4 @@
 /.idea/
 /kotlin-js-store/
 /local.properties
+*.hprof

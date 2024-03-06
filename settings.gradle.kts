@@ -12,7 +12,6 @@ pluginManagement {
       }
     }
   }
-  
   plugins {
     kotlin("multiplatform") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
