@@ -12,10 +12,12 @@ val json = Json {
   prettyPrintIndent = "  "
 }
 
-fun JsonElement.jsonString(field: String): String = checkNotNull(jsonObject[field]).jsonPrimitive.content
+fun JsonElement.jsonObject(field: String): JsonElement = checkNotNull(jsonObject[field]){ "$field was null" }
+
+fun JsonElement.jsonString(field: String): String = checkNotNull(jsonObject(field)).jsonPrimitive.content
 fun JsonElement.jsonStringOrNull(field: String): String? = ((this as? JsonObject)?.get(field) as? JsonPrimitive)?.content
 
-fun JsonElement.jsonBoolean(field: String): Boolean = checkNotNull(jsonObject[field]).jsonPrimitive.boolean
+fun JsonElement.jsonBoolean(field: String): Boolean = checkNotNull(jsonObject(field)).jsonPrimitive.boolean
 fun JsonElement.jsonBooleanOrNull(field: String): Boolean? = ((this as? JsonObject)?.get(field) as? JsonPrimitive)?.boolean
 
 @OptIn(ExperimentalUnsignedTypes::class)
