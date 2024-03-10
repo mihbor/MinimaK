@@ -10,6 +10,7 @@ val json = Json {
   serializersModule = bigDecimalHumanReadableSerializerModule
   prettyPrint = true
   prettyPrintIndent = "  "
+  isLenient = true
 }
 
 fun JsonElement.jsonObject(field: String): JsonElement = checkNotNull(jsonObject[field]){ "$field was null" }

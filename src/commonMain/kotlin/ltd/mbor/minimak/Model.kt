@@ -4,6 +4,7 @@
 package ltd.mbor.minimak
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseContextualSerialization
@@ -74,6 +75,49 @@ data class Transaction(
     val block get() = _block.toInt()
     val timeMillis get() = _timemilli.toLong()
   }
+}
+
+@Serializable
+data class Block(
+  @JsonNames("txpowid")
+  val id: String,
+  @JsonNames("superblock")
+  val superBlock: Int,
+  val size: Int,
+  @Contextual
+  val burn: BigDecimal,
+  val header: Header,
+  val body: Body
+) {
+  @Serializable
+  data class Header(
+    @JsonNames("chainid")
+    val chainId: String,
+    @JsonNames("block")
+    val _block: String,
+    @JsonNames("cascadelevels")
+    val cascadeLevels: Int,
+    @JsonNames("superparents")
+    val superParents: List<Parent>,
+    @JsonNames("timemilli")
+    val _timemilli: String,
+    val date: String
+  ) {
+    val block get() = _block.toInt()
+    val timeMillis get() = _timemilli.toLong()
+
+    @Serializable
+    data class Parent(
+      val difficulty: Int,
+      val count: Int,
+      val parent: String
+    )
+  }
+  @Serializable
+  data class Body(
+    @JsonNames("txnlist")
+    val txnList: List<String>
+  )
 }
 
 @Serializable

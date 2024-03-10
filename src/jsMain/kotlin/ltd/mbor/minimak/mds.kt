@@ -35,7 +35,6 @@ object ServiceMDS: MdsApi {
   override var logging: Boolean = false
 
   fun init(callback: (JsonElement) -> Unit) = DynamicMDS.init{ msg: dynamic ->
-    DynamicMDS.log("init: ${JSON.stringify(msg)}")
     callback(json.decodeFromString<JsonElement>(JSON.stringify(msg)))
   }
 
