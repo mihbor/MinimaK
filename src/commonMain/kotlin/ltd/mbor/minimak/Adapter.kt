@@ -222,3 +222,10 @@ suspend fun MdsApi.hash(data: ByteArray, type: String = "keccak") = hash(data.to
 
 suspend fun MdsApi.hash(data: String, type: String = "keccak") =
   cmd("hash data:$data type:$type")!!.jsonObject("response").jsonString("hash")
+
+suspend fun MdsApi.burn(): Map<String, BurnStats> {
+  val burn = cmd("burn")!!.jsonObject("response").jsonObject
+  return burn.map {
+    it.key to json.decodeFromJsonElement<BurnStats>(it.value)
+  }.toMap()
+}

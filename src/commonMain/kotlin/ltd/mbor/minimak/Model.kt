@@ -250,3 +250,12 @@ data class Key(
   @JsonNames("maxuses")
   val maxUses: Int
 )
+
+@Serializable
+data class BurnStats(
+  val txns: Int,
+  val max: BigDecimal,
+  val med: BigDecimal,
+  val avg: BigDecimal,
+  val min: BigDecimal
+)
