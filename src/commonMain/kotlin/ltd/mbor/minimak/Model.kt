@@ -1,26 +1,22 @@
 @file:UseContextualSerialization(BigDecimal::class)
-@file:OptIn(ExperimentalSerializationApi::class)
 
 package ltd.mbor.minimak
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseContextualSerialization
+import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 
 @Serializable
 data class Balance(
-  @JsonNames("tokenid")
+  @SerialName("tokenid")
   val tokenId: String,
-  @JsonNames("token")
+  @SerialName("token")
   val _token: JsonElement,
   val total: BigDecimal,
   val confirmed: BigDecimal,
   val unconfirmed: BigDecimal,
   val sendable: BigDecimal,
-  @JsonNames("coins")
+  @SerialName("coins")
   val _coins: String
 ) {
   val tokenName: String? get() = when(_token) {
@@ -34,18 +30,18 @@ data class Balance(
 
 @Serializable
 data class Token(
-  @JsonNames("tokenid")
+  @SerialName("tokenid")
   val tokenId: String,
-  @JsonNames("name")
+  @SerialName("name")
   val _name: JsonElement,
   val total: BigDecimal,
   val decimals: Int,
   val script: String? = null,
-  @JsonNames("coinid")
+  @SerialName("coinid")
   val coinId: String? = null,
-  @JsonNames("totalamount")
+  @SerialName("totalamount")
   val totalAmount: BigDecimal? = null,
-  @JsonNames("scale")
+  @SerialName("scale")
   val _scale: JsonPrimitive
 ) {
   val name: String? get() = when(_name) {
@@ -61,15 +57,15 @@ data class Transaction(
   val inputs: List<Coin>,
   val outputs: List<Coin>,
   val state: List<State>,
-  @JsonNames("transactionid")
+  @SerialName("transactionid")
   val transactionId: String,
   val header: Header? = null
 ) {
   @Serializable
   data class Header(
-    @JsonNames("block")
+    @SerialName("block")
     val _block: String,
-    @JsonNames("timemilli")
+    @SerialName("timemilli")
     val _timemilli: String
   ) {
     val block get() = _block.toInt()
@@ -79,9 +75,9 @@ data class Transaction(
 
 @Serializable
 data class Block(
-  @JsonNames("txpowid")
+  @SerialName("txpowid")
   val id: String,
-  @JsonNames("superblock")
+  @SerialName("superblock")
   val superBlock: Int,
   val size: Int,
   @Contextual
@@ -91,15 +87,15 @@ data class Block(
 ) {
   @Serializable
   data class Header(
-    @JsonNames("chainid")
+    @SerialName("chainid")
     val chainId: String,
-    @JsonNames("block")
+    @SerialName("block")
     val _block: String,
-    @JsonNames("cascadelevels")
+    @SerialName("cascadelevels")
     val cascadeLevels: Int,
-    @JsonNames("superparents")
+    @SerialName("superparents")
     val superParents: List<Parent>,
-    @JsonNames("timemilli")
+    @SerialName("timemilli")
     val _timemilli: String,
     val date: String
   ) {
@@ -115,7 +111,7 @@ data class Block(
   }
   @Serializable
   data class Body(
-    @JsonNames("txnlist")
+    @SerialName("txnlist")
     val txnList: List<String>
   )
 }
@@ -123,19 +119,19 @@ data class Block(
 @Serializable
 data class Coin(
   val address: String,
-  @JsonNames("miniaddress")
+  @SerialName("miniaddress")
   val miniAddress: String,
   val amount: BigDecimal,
-  @JsonNames("tokenamount")
+  @SerialName("tokenamount")
   val tokenAmount: BigDecimal = amount,
-  @JsonNames("coinid")
+  @SerialName("coinid")
   val coinId: String,
-  @JsonNames("storestate")
+  @SerialName("storestate")
   val storeState: Boolean,
-  @JsonNames("tokenid")
+  @SerialName("tokenid")
   val tokenId: String,
   val token: Token?,
-  @JsonNames("created")
+  @SerialName("created")
   val _created: String,
   val state: List<State>
 ) {
@@ -159,20 +155,20 @@ data class Output(
 @Serializable
 data class Contact(
   val id: Int,
-  @JsonNames("publickey")
+  @SerialName("publickey")
   val publicKey: String,
-  @JsonNames("currentaddress")
+  @SerialName("currentaddress")
   val currentAddress: String,
-  @JsonNames("myaddress")
+  @SerialName("myaddress")
   val myAddress: String,
-  @JsonNames("lastseen")
+  @SerialName("lastseen")
   val lastSeen: Long,
   val date: String,
-  @JsonNames("chaintip")
+  @SerialName("chaintip")
   val _chainTip: String,
-  @JsonNames("samechain")
+  @SerialName("samechain")
   val sameChain: Boolean,
-  @JsonNames("extradata")
+  @SerialName("extradata")
   val extraData: ExtraData
 ) {
   val chainTip = _chainTip.toInt()
@@ -181,13 +177,13 @@ data class Contact(
 @Serializable
 data class ExtraData(
   val name: String,
-  @JsonNames("minimaaddress")
+  @SerialName("minimaaddress")
   val minimaAddress: String,
-  @JsonNames("topblock")
+  @SerialName("topblock")
   val _topBlock: String,
-  @JsonNames("checkblock")
+  @SerialName("checkblock")
   val _checkBlock: String,
-  @JsonNames("checkhash")
+  @SerialName("checkhash")
   val checkHash: String,
   val mls: String
 ) {
@@ -198,17 +194,17 @@ data class ExtraData(
 @Serializable
 data class MaximaInfo(
   val contact: String,
-  @JsonNames("localidentity")
+  @SerialName("localidentity")
   val localIdentity: String,
   val logs: Boolean,
   val mls: String,
   val name: String,
-  @JsonNames("p2pidentity")
+  @SerialName("p2pidentity")
   val p2pIdentity: String,
   val poll: Int,
-  @JsonNames("publickey")
+  @SerialName("publickey")
   val publicKey: String,
-  @JsonNames("staticmls")
+  @SerialName("staticmls")
   val staticMls: Boolean
 )
 
@@ -217,12 +213,12 @@ data class MaximaMessage(
   val from: String,
   val to: String,
   val time: String,
-  @JsonNames("timemilli")
+  @SerialName("timemilli")
   val timeMilli: Long,
   val random: String,
   val application: String,
   val data: String,
-  @JsonNames("msgid")
+  @SerialName("msgid")
   val msgId: String
 )
 
@@ -230,24 +226,24 @@ data class MaximaMessage(
 data class Address(
   val script: String,
   val address: String,
-  @JsonNames("miniaddress")
+  @SerialName("miniaddress")
   val miniAddress: String,
   val simple: Boolean,
   val default: Boolean,
-  @JsonNames("publickey")
+  @SerialName("publickey")
   val publicKey: String,
   val track: Boolean
 )
 
 @Serializable
 data class Key(
-  @JsonNames("publickey")
+  @SerialName("publickey")
   val publicKey: String,
   val modifier: String,
   val size: Int,
   val depth: Int,
   val uses: Int,
-  @JsonNames("maxuses")
+  @SerialName("maxuses")
   val maxUses: Int
 )
 
