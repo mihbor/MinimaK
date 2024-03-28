@@ -12,6 +12,11 @@ data class Result(
   }
 }
 
+suspend fun MdsApi.getStatus(): Status {
+  val status = cmd("status")!!
+  return json.decodeFromJsonElement(status.jsonObject("response"))
+}
+
 suspend fun MdsApi.getBlockNumber(): Int {
   val status = cmd("status")!!
   return status.jsonObject("response").jsonObject("chain").jsonObject("block").jsonPrimitive.int

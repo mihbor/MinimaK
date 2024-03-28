@@ -252,6 +252,35 @@ data class Key(
 )
 
 @Serializable
+data class Status(
+  val version: String,
+  val locked: Boolean,
+  val length: Long,
+  val weight: BigDecimal,
+  val chain: Chain,
+) {
+  @Serializable
+  data class Chain(
+    val block: Long,
+    val time: String,
+    val hash: String,
+    val speed: BigDecimal,
+    val size: Int,
+    val length: Int,
+    val branches: Int,
+    val weight: BigDecimal,
+    val cascade: Cascade,
+  ) {
+    @Serializable
+    data class Cascade(
+      val start: Long,
+      val length: Int,
+      val weight: BigDecimal
+    )
+  }
+}
+
+@Serializable
 data class BurnStats(
   val txns: Int,
   val max: BigDecimal,
