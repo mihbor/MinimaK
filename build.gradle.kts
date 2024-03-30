@@ -1,5 +1,5 @@
 group = "ltd.mbor"
-version = "0.4.2"
+version = "0.4.3-SNAPSHOT"
 
 val ktorVersion = "2.3.4"
 val bignumVersion = "0.3.8"

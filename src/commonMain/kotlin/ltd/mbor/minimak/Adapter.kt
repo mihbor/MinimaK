@@ -185,6 +185,11 @@ suspend fun MdsApi.getTxPoW(txPoWId: String): JsonElement? {
   return txnpow.jsonObject["response"]
 }
 
+suspend fun MdsApi.getTxPoW(block: Long): JsonElement? {
+  val txnpow = cmd("txpow block:$block")!!
+  return txnpow.jsonObject["response"]
+}
+
 suspend fun MdsApi.getTransactions(address: String): List<Transaction>? = getTxPoWs(address)?.map{
   it.toTransaction()
 }
