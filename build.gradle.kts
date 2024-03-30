@@ -1,8 +1,8 @@
 group = "ltd.mbor"
-version = "0.4.2"
+version = "0.5.0-SNAPSHOT"
 
-val ktorVersion = "2.3.4"
-val bignumVersion = "0.3.8"
+val ktorVersion = "3.0.0-wasm2"
+val bignumVersion = "0.3.9"
 
 buildscript {
   repositories {
@@ -25,6 +25,7 @@ plugins {
 repositories {
   google()
   mavenCentral()
+  maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
 }
 
 kotlin {
@@ -45,6 +46,7 @@ kotlin {
       }
     }
   }
+  wasmJs()
 //  val hostOs = System.getProperty("os.name")
 //  val isMingwX64 = hostOs.startsWith("Windows")
 //  val nativeTarget = when {
@@ -54,7 +56,7 @@ kotlin {
 //    else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
 //  }
   
-  android {
+  androidTarget {
     publishLibraryVariants("release", "debug")
     compilations.all {
       kotlinOptions.jvmTarget = "11"
@@ -63,16 +65,18 @@ kotlin {
   sourceSets {
     val commonMain by getting {
       dependencies {
-        api("io.ktor:ktor-client-core:$ktorVersion")
-        api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+        api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
         api("com.ionspin.kotlin:bignum:$bignumVersion")
         api("com.ionspin.kotlin:bignum-serialization-kotlinx:$bignumVersion")
+        api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+        api("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+        implementation("io.ktor:ktor-client-core:$ktorVersion")
       }
     }
     val commonTest by getting {
       dependencies {
         implementation(kotlin("test"))
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
       }
     }
     val jvmMain by getting {
@@ -98,7 +102,7 @@ kotlin {
         implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
       }
     }
-    val androidTest by getting {
+    val androidUnitTest by getting {
       dependencies {
         implementation("junit:junit:4.13.2")
       }
