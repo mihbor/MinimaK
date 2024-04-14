@@ -261,6 +261,7 @@ data class Status(
     val time: String,
     val hash: String,
     val speed: BigDecimal,
+    val difficulty: String,
     val size: Int,
     val length: Int,
     val branches: Int,
